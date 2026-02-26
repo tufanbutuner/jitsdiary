@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
 import { createServerClient } from "@/lib/pocketbase-server";
+import NewSessionModal from "@/components/NewSessionModal";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
@@ -10,9 +13,10 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
   open_mat: "Open Mat",
 };
 
-async function getSessions(): Promise<SessionWithGym[]> {
+async function getSessions(userId: string): Promise<SessionWithGym[]> {
   const pb = createServerClient();
-  const result = await pb.collection("sessions").getList<SessionWithGym>(1, 20, {
+  const result = await pb.collection("sessions").getList<SessionWithGym>(1, 50, {
+    filter: `user_id = "${userId}"`,
     expand: "gym_id",
     sort: "-date",
   });
@@ -20,7 +24,10 @@ async function getSessions(): Promise<SessionWithGym[]> {
 }
 
 export default async function SessionsPage() {
-  const sessions = await getSessions();
+  const { userId } = await auth();
+  if (!userId) redirect("/");
+
+  const sessions = await getSessions(userId);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
@@ -29,27 +36,18 @@ export default async function SessionsPage() {
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
             Sessions
           </h1>
-          <Link
-            href="/"
-            className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
-          >
-            &larr; Home
-          </Link>
+          <NewSessionModal />
         </div>
 
         {sessions.length === 0 ? (
-          <p className="text-zinc-500">
-            No sessions yet. Add one via the{" "}
-            <a
-              href="http://127.0.0.1:8090/_/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              PocketBase admin
-            </a>
-            .
-          </p>
+          <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-12 text-center">
+            <p className="text-zinc-500 dark:text-zinc-400 mb-1 font-medium">
+              No sessions yet
+            </p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              Hit &ldquo;+ New Session&rdquo; above to log your first training session.
+            </p>
+          </div>
         ) : (
           <ul className="space-y-3">
             {sessions.map((session) => {
