@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
-import { createServerClient } from "@/lib/pocketbase-server";
+import { getSessionsForUser } from "@/lib/pocketbase-server";
 import NewSessionModal from "@/components/NewSessionModal";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
@@ -14,13 +14,7 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
 };
 
 async function getSessions(userId: string): Promise<SessionWithGym[]> {
-  const pb = createServerClient();
-  const result = await pb.collection("sessions").getList<SessionWithGym>(1, 50, {
-    filter: `user_id = "${userId}"`,
-    expand: "gym_id",
-    sort: "-date",
-  });
-  return result.items;
+  return getSessionsForUser(userId) as Promise<SessionWithGym[]>;
 }
 
 export default async function SessionsPage() {

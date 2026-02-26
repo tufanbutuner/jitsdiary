@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       gym_id: body.gym_id || undefined,
       duration_minutes: body.duration_minutes ? Number(body.duration_minutes) : undefined,
       notes: body.notes || undefined,
+      coach: body.coach || undefined,
     });
     return Response.json(session, { status: 201 });
   } catch (e) {

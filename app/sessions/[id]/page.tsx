@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
-import { createServerClient } from "@/lib/pocketbase-server";
+import { getSessionById, getRoundsForSession } from "@/lib/pocketbase-server";
+import EditSessionModal from "@/components/EditSessionModal";
+import LogTechniquesModal from "@/components/LogTechniquesModal";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
@@ -23,14 +24,10 @@ const OUTCOME_COLORS: Record<string, string> = {
 };
 
 async function getSession(id: string) {
-  const pb = createServerClient();
-  const session = await pb
-    .collection("sessions")
-    .getOne<SessionWithGym>(id, { expand: "gym_id" });
-  const { items: rounds } = await pb.collection("rolling_rounds").getList(1, 200, {
-    filter: `session_id = "${id}"`,
-    sort: "created",
-  });
+  const [session, rounds] = await Promise.all([
+    getSessionById(id) as Promise<SessionWithGym>,
+    getRoundsForSession(id),
+  ]);
   return { session, rounds };
 }
 
@@ -46,13 +43,9 @@ export default async function SessionDetailPage({
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <Link
-            href="/sessions"
-            className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
-          >
-            &larr; Sessions
-          </Link>
+        <div className="mb-6 flex items-center justify-end gap-3">
+          <LogTechniquesModal sessionId={id} />
+          <EditSessionModal session={session} />
         </div>
 
         <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 mb-8">
@@ -71,6 +64,7 @@ export default async function SessionDetailPage({
                 {session.duration_minutes
                   ? ` · ${session.duration_minutes} min`
                   : ""}
+                {session.coach ? ` · ${session.coach}` : ""}
               </p>
             </div>
             <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">

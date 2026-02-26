@@ -8,7 +8,19 @@ interface Gym {
   name: string;
 }
 
-export default function NewSessionModal() {
+interface Props {
+  session: {
+    id: string;
+    date: string;
+    session_type: string;
+    gym_id?: string;
+    duration_minutes?: number;
+    coach?: string;
+    notes?: string;
+  };
+}
+
+export default function EditSessionModal({ session }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [gyms, setGyms] = useState<Gym[]>([]);
@@ -16,12 +28,12 @@ export default function NewSessionModal() {
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
-    date: new Date().toISOString().slice(0, 10),
-    session_type: "gi",
-    gym_id: "",
-    duration_minutes: "",
-    coach: "",
-    notes: "",
+    date: session.date.slice(0, 10),
+    session_type: session.session_type,
+    gym_id: session.gym_id ?? "",
+    duration_minutes: session.duration_minutes?.toString() ?? "",
+    coach: session.coach ?? "",
+    notes: session.notes ?? "",
   });
 
   useEffect(() => {
@@ -33,9 +45,7 @@ export default function NewSessionModal() {
   }, [open]);
 
   function handleChange(
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
@@ -45,17 +55,15 @@ export default function NewSessionModal() {
     setSubmitting(true);
     setError("");
     try {
-      const res = await fetch("/api/sessions", {
-        method: "POST",
+      const res = await fetch(`/api/sessions/${session.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
       if (!res.ok) {
         const text = await res.text();
-        let message = "Failed to create session";
-        try {
-          message = JSON.parse(text).error ?? message;
-        } catch {}
+        let message = "Failed to update session";
+        try { message = JSON.parse(text).error ?? message; } catch {}
         throw new Error(message);
       }
       setOpen(false);
@@ -71,9 +79,9 @@ export default function NewSessionModal() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 transition dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
       >
-        + New Session
+        Edit Session
       </button>
 
       {open && (
@@ -81,7 +89,7 @@ export default function NewSessionModal() {
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                New Session
+                Edit Session
               </h2>
               <button
                 onClick={() => setOpen(false)}
@@ -93,9 +101,7 @@ export default function NewSessionModal() {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Date
-                </label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Date</label>
                 <input
                   type="date"
                   name="date"
@@ -107,9 +113,7 @@ export default function NewSessionModal() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Type
-                </label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Type</label>
                 <select
                   name="session_type"
                   value={form.session_type}
@@ -123,9 +127,7 @@ export default function NewSessionModal() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Gym
-                </label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Gym</label>
                 <select
                   name="gym_id"
                   value={form.gym_id}
@@ -134,17 +136,13 @@ export default function NewSessionModal() {
                 >
                   <option value="">No gym</option>
                   {gyms.map((g) => (
-                    <option key={g.id} value={g.id}>
-                      {g.name}
-                    </option>
+                    <option key={g.id} value={g.id}>{g.name}</option>
                   ))}
                 </select>
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Duration (minutes)
-                </label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Duration (minutes)</label>
                 <input
                   type="number"
                   name="duration_minutes"
@@ -157,9 +155,7 @@ export default function NewSessionModal() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Coach
-                </label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Coach</label>
                 <input
                   type="text"
                   name="coach"
@@ -171,9 +167,7 @@ export default function NewSessionModal() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Notes
-                </label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Notes</label>
                 <textarea
                   name="notes"
                   rows={3}
@@ -201,7 +195,7 @@ export default function NewSessionModal() {
                   disabled={submitting}
                   className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 transition dark:bg-zinc-50 dark:text-zinc-900"
                 >
-                  {submitting ? "Saving..." : "Save Session"}
+                  {submitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>

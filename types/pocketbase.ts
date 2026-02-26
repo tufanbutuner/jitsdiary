@@ -119,7 +119,6 @@ export type GymsRecord = {
 	id: string
 	location?: string
 	name: string
-	user_id: string
 }
 
 export enum RollingRoundsPartnerBeltOptions {
@@ -160,6 +159,7 @@ export enum SessionsSessionTypeOptions {
 	"open_mat" = "open_mat",
 }
 export type SessionsRecord = {
+	coach?: string
 	date: string
 	duration_minutes?: number
 	gym_id?: RecordIdString
@@ -181,7 +181,6 @@ export type TechniquesRecord = {
 	category: TechniquesCategoryOptions
 	id: string
 	name: string
-	user_id: string
 }
 
 export type UsersRecord = {

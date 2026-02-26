@@ -7,7 +7,6 @@ export async function GET() {
 
   const pb = createServerClient();
   const { items } = await pb.collection("gyms").getList(1, 100, {
-    filter: `user_id = "${userId}"`,
     sort: "name",
   });
   return Response.json(items);
