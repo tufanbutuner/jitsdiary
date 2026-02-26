@@ -109,8 +109,9 @@ export default function SessionCalendar({ sessionDates }: SessionCalendarProps) 
         hidden: cn("invisible", defaultClassNames.hidden),
       }}
       components={{
-        MonthCaption: CustomMonthCaption as React.ComponentType<{ calendarMonth: { date: Date } }>,
-        Nav: () => null,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        MonthCaption: CustomMonthCaption as any,
+        Nav: () => <></>,
         DayButton: ({ day, modifiers, className, ...props }: React.ComponentProps<typeof DayButton>) => {
           const count = countByDay[dateKey(day.date)];
           const isSelected = modifiers.selected;
