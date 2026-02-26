@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getSessionsForUser } from "@/lib/pocketbase-server";
 import { GymsResponse, SessionsResponse } from "@/types/pocketbase";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
@@ -14,7 +15,54 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
 
 export default async function Home() {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
+        <main className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+          <h1 className="text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-4">
+            Your BJJ training diary.
+          </h1>
+          <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-md mb-10">
+            Log every session, track your rounds, and build your technique library — all in one place.
+          </p>
+
+          <div className="flex gap-3">
+            <SignUpButton mode="modal">
+              <button className="rounded-lg bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 transition dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
+                Get started free
+              </button>
+            </SignUpButton>
+            <SignInButton mode="modal">
+              <button className="rounded-lg border border-zinc-200 px-6 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 transition dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+                Sign in
+              </button>
+            </SignInButton>
+          </div>
+
+          <div className="mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl w-full text-left">
+            <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-1">Track Sessions</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Log every training session with gym, coach, duration, and notes.</p>
+            </div>
+            <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-1">Log Rolling Rounds</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Record your sparring partners, belt levels, and round outcomes.</p>
+            </div>
+            <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-1">Technique Library</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Tag techniques you drilled each session from a shared library.</p>
+            </div>
+          </div>
+        </main>
+
+        <footer className="py-6 text-center text-xs text-zinc-400 dark:text-zinc-600">
+          © {new Date().getFullYear()} JitsDiary
+        </footer>
+      </div>
+    );
+  }
+
 
   const sessions = (await getSessionsForUser(userId)) as SessionWithGym[];
 
