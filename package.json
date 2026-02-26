@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"next dev\" \"./pocketbase/pocketbase serve\"",
+    "dev:next": "next dev",
+    "db": "./pocketbase/pocketbase serve",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.38.2",
+    "concurrently": "^9.2.1",
     "next": "16.1.6",
+    "pocketbase": "^0.26.8",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
