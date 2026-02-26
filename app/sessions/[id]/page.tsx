@@ -27,12 +27,10 @@ async function getSession(id: string) {
   const session = await pb
     .collection("sessions")
     .getOne<SessionWithGym>(id, { expand: "gym_id" });
-  const { items: rounds } = await pb
-    .collection("rolling_rounds")
-    .getList(1, 200, {
-      filter: `session_id = "${id}"`,
-      sort: "created",
-    });
+  const { items: rounds } = await pb.collection("rolling_rounds").getList(1, 200, {
+    filter: `session_id = "${id}"`,
+    sort: "created",
+  });
   return { session, rounds };
 }
 
