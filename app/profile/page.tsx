@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createServerClient } from "@/lib/pocketbase-server";
 import { getAuthUser } from "@/lib/auth";
-import { GymsResponse, ProfilesResponse } from "@/types/pocketbase";
+import { BeltProgressionsResponse, GymsResponse, ProfilesResponse } from "@/types/pocketbase";
 import EditProfileForm from "@/components/EditProfileForm";
+import BeltProgressions from "@/components/BeltProgressions";
 import { Card, CardContent } from "@/components/ui/card";
 
 type ProfileWithGym = ProfilesResponse<{ gym_id: GymsResponse }>;
@@ -21,12 +22,16 @@ export default async function ProfilePage() {
   const { userId } = authUser;
 
   const pb = createServerClient();
-  const [{ items: profiles }, { items: gyms }] = await Promise.all([
+  const [{ items: profiles }, { items: gyms }, { items: progressions }] = await Promise.all([
     pb.collection("profiles").getList(1, 1, {
       filter: `user_id = "${userId}"`,
       expand: "gym_id",
     }),
     pb.collection("gyms").getList(1, 100, { sort: "name" }),
+    pb.collection("belt_progressions").getList(1, 100, {
+      filter: `user_id = "${userId}"`,
+      sort: "promoted_on",
+    }),
   ]);
 
   const profile = (profiles[0] as ProfileWithGym) ?? null;
@@ -57,6 +62,11 @@ export default async function ProfilePage() {
         )}
 
         <EditProfileForm profile={profile} gyms={gyms} />
+
+        <BeltProgressions
+          progressions={progressions as BeltProgressionsResponse[]}
+          gyms={gyms}
+        />
       </div>
     </div>
   );
