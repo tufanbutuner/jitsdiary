@@ -50,8 +50,12 @@ export default function NewSessionModal() {
         body: JSON.stringify(form),
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to create session");
+        const text = await res.text();
+        let message = "Failed to create session";
+        try {
+          message = JSON.parse(text).error ?? message;
+        } catch {}
+        throw new Error(message);
       }
       setOpen(false);
       router.refresh();
