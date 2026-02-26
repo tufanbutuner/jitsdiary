@@ -2,6 +2,8 @@ import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserBut
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,8 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <ThemeProvider>
           <header className="flex items-center justify-between px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <div className="flex items-center gap-6">
               <Link href="/" className="font-semibold text-zinc-900 dark:text-zinc-50">JitsDiary</Link>
@@ -35,6 +38,7 @@ export default function RootLayout({
               <Link href="/profile" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">Profile</Link>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <SignedOut>
                 <SignInButton mode="modal" />
                 <SignUpButton mode="modal" />
@@ -45,6 +49,7 @@ export default function RootLayout({
             </div>
           </header>
           {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

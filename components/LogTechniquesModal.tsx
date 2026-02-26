@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface Technique {
   id: string;
@@ -93,7 +95,6 @@ export default function LogTechniquesModal({ sessionId }: Props) {
       });
       if (!res.ok) throw new Error("Failed to log techniques");
       setSelected(new Set());
-      // Refresh logged list
       const updated = await fetch(`/api/sessions/${sessionId}/techniques`).then((r) => r.json());
       setLogged(updated);
       router.refresh();
@@ -104,36 +105,32 @@ export default function LogTechniquesModal({ sessionId }: Props) {
     }
   }
 
+  function handleClose() {
+    setOpen(false);
+    setSelected(new Set());
+    setSearch("");
+  }
+
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-      >
-        Log Techniques
-      </button>
+      <Button variant="outline" onClick={() => setOpen(true)}>Log Techniques</Button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 flex flex-col max-h-[85vh]">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                Log Techniques
-              </h2>
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Log Techniques</h2>
               <button
-                onClick={() => { setOpen(false); setSelected(new Set()); setSearch(""); }}
+                onClick={handleClose}
                 className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xl leading-none"
               >
                 ×
               </button>
             </div>
 
-            {/* Already logged */}
             {logged.length > 0 && (
               <div className="mb-4">
-                <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">
-                  Already logged
-                </p>
+                <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">Already logged</p>
                 <div className="flex flex-wrap gap-2">
                   {logged.map((st) => (
                     <span
@@ -141,28 +138,20 @@ export default function LogTechniquesModal({ sessionId }: Props) {
                       className="flex items-center gap-1 rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                     >
                       {st.expand?.technique_id?.name ?? st.technique_id}
-                      <button
-                        onClick={() => handleRemove(st)}
-                        className="ml-1 text-zinc-400 hover:text-red-500"
-                      >
-                        ×
-                      </button>
+                      <button onClick={() => handleRemove(st)} className="ml-1 text-zinc-400 hover:text-red-500">×</button>
                     </span>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Search */}
-            <input
-              type="text"
+            <Input
               placeholder="Search techniques..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="mb-4 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+              className="mb-4"
             />
 
-            {/* Library */}
             <div className="overflow-y-auto flex-1 space-y-4 pr-1">
               {Object.keys(grouped).length === 0 ? (
                 <p className="text-sm text-zinc-400 text-center py-4">No techniques found</p>
@@ -193,29 +182,17 @@ export default function LogTechniquesModal({ sessionId }: Props) {
               )}
             </div>
 
-            {error && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>
-            )}
+            {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
             <div className="flex items-center justify-between mt-5 pt-4 border-t border-zinc-100 dark:border-zinc-800">
               <span className="text-sm text-zinc-500">
                 {selected.size > 0 ? `${selected.size} selected` : ""}
               </span>
               <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => { setOpen(false); setSelected(new Set()); setSearch(""); }}
-                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={submitting || selected.size === 0}
-                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 transition dark:bg-zinc-50 dark:text-zinc-900"
-                >
+                <Button variant="outline" type="button" onClick={handleClose}>Close</Button>
+                <Button onClick={handleSave} disabled={submitting || selected.size === 0}>
                   {submitting ? "Saving..." : "Add Selected"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
