@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
 import { getSessionsForUser } from "@/lib/pocketbase-server";
+import { getAuthUser } from "@/lib/auth";
 import NewSessionModal from "@/components/NewSessionModal";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -19,10 +19,10 @@ async function getSessions(userId: string): Promise<SessionWithGym[]> {
 }
 
 export default async function SessionsPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/");
+  const authUser = await getAuthUser();
+  if (!authUser) redirect("/sign-in");
 
-  const sessions = await getSessions(userId);
+  const sessions = await getSessions(authUser.userId);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
@@ -34,7 +34,7 @@ export default async function SessionsPage() {
           <NewSessionModal />
         </div>
 
-        {sessions.length === 0 ? (
+{sessions.length === 0 ? (
           <Card className="border-dashed p-12 text-center">
             <CardContent className="py-0">
               <p className="text-muted-foreground mb-1 font-medium">

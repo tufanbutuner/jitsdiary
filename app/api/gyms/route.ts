@@ -1,9 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
+import { getAuthUser } from "@/lib/auth";
 import { createServerClient } from "@/lib/pocketbase-server";
 
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const authUser = await getAuthUser();
+  if (!authUser) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const pb = createServerClient();
   const { items } = await pb.collection("gyms").getList(1, 100, {

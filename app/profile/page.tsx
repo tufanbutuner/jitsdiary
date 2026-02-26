@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createServerClient } from "@/lib/pocketbase-server";
+import { getAuthUser } from "@/lib/auth";
 import { GymsResponse, ProfilesResponse } from "@/types/pocketbase";
 import EditProfileForm from "@/components/EditProfileForm";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,8 +16,9 @@ const BELT_COLORS: Record<string, string> = {
 };
 
 export default async function ProfilePage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/");
+  const authUser = await getAuthUser();
+  if (!authUser) redirect("/sign-in");
+  const { userId } = authUser;
 
   const pb = createServerClient();
   const [{ items: profiles }, { items: gyms }] = await Promise.all([
