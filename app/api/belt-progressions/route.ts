@@ -20,11 +20,17 @@ export async function POST(request: Request) {
   const body = await request.json();
   const pb = createServerClient();
   try {
+    const stripes = Number(body.stripes ?? 0);
+    // PocketBase rejects 0 for required number fields — send null for zero stripes
+    // and handle display client-side
     const record = await pb.collection("belt_progressions").create({
       user_id: authUser.userId,
       belt: body.belt,
-      stripes: Number(body.stripes ?? 0),
-      promoted_on: body.promoted_on,
+      stripes: stripes === 0 ? null : stripes,
+      // date input gives "YYYY-MM-DD", PB needs a full datetime string
+      promoted_on: body.promoted_on.length === 10
+        ? `${body.promoted_on} 00:00:00.000Z`
+        : body.promoted_on,
       gym_id: body.gym_id || null,
       notes: body.notes || null,
     });

@@ -231,7 +231,7 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
                       )}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(p.promoted_on).toLocaleDateString("en-US", {
+                      {new Date(p.promoted_on.slice(0, 10) + "T12:00:00").toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
