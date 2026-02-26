@@ -37,9 +37,16 @@ export default function NewSessionModal() {
 
   useEffect(() => {
     if (!open) return;
-    fetch("/api/gyms")
-      .then((r) => r.json())
-      .then(setGyms)
+    Promise.all([
+      fetch("/api/gyms").then((r) => r.json()),
+      fetch("/api/profile").then((r) => r.json()),
+    ])
+      .then(([gymList, profile]) => {
+        setGyms(gymList);
+        if (profile?.gym_id) {
+          setForm((f) => ({ ...f, gym_id: profile.gym_id }));
+        }
+      })
       .catch(() => {});
   }, [open]);
 

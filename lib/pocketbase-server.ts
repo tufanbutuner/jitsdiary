@@ -27,8 +27,25 @@ function rawGet(path: string): Promise<Record<string, unknown>> {
     socket.on("end", () => {
       const bodyStart = raw.indexOf("\r\n\r\n");
       if (bodyStart === -1) return reject(new Error("No HTTP body"));
+      let body = raw.slice(bodyStart + 4);
+
+      // Decode chunked transfer-encoding if present
+      if (/transfer-encoding:\s*chunked/i.test(raw.slice(0, bodyStart))) {
+        let decoded = "";
+        let pos = 0;
+        while (pos < body.length) {
+          const lineEnd = body.indexOf("\r\n", pos);
+          if (lineEnd === -1) break;
+          const chunkSize = parseInt(body.slice(pos, lineEnd), 16);
+          if (isNaN(chunkSize) || chunkSize === 0) break;
+          decoded += body.slice(lineEnd + 2, lineEnd + 2 + chunkSize);
+          pos = lineEnd + 2 + chunkSize + 2; // skip trailing \r\n
+        }
+        body = decoded;
+      }
+
       try {
-        resolve(JSON.parse(raw.slice(bodyStart + 4)));
+        resolve(JSON.parse(body));
       } catch (e) {
         reject(e);
       }
@@ -55,6 +72,14 @@ export async function getRoundsForSession(sessionId: string): Promise<RollingRou
     throw new Error(`getRoundsForSession failed: ${(json.message as string) ?? "unknown"}`);
   }
   return (json.items as RollingRoundsResponse[]) ?? [];
+}
+
+export async function getTechniquesForSession(sessionId: string): Promise<{ id: string; technique_id: string; notes?: string; drill_count?: number; expand?: { technique_id?: { id: string; name: string; category?: string } } }[]> {
+  const filter = `session_id=%22${sessionId}%22`;
+  const path = `/api/collections/session_techniques/records?perPage=200&filter=${filter}&expand=technique_id`;
+  const json = await rawGet(path);
+  if (typeof json.status === "number" && json.status >= 400) return [];
+  return (json.items as never[]) ?? [];
 }
 
 export async function getSessionsForUser(userId: string): Promise<SessionsResponse[]> {

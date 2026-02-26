@@ -1,5 +1,5 @@
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
-import { getSessionById, getRoundsForSession } from "@/lib/pocketbase-server";
+import { getSessionById, getRoundsForSession, getTechniquesForSession } from "@/lib/pocketbase-server";
 import EditSessionModal from "@/components/EditSessionModal";
 import LogTechniquesModal from "@/components/LogTechniquesModal";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,11 +25,12 @@ const OUTCOME_COLORS: Record<string, string> = {
 };
 
 async function getSession(id: string) {
-  const [session, rounds] = await Promise.all([
+  const [session, rounds, techniques] = await Promise.all([
     getSessionById(id) as Promise<SessionWithGym>,
     getRoundsForSession(id),
+    getTechniquesForSession(id),
   ]);
-  return { session, rounds };
+  return { session, rounds, techniques };
 }
 
 export default async function SessionDetailPage({
@@ -38,7 +39,7 @@ export default async function SessionDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { session, rounds } = await getSession(id);
+  const { session, rounds, techniques } = await getSession(id);
   const gym = session.expand?.gym_id;
 
   return (
@@ -80,6 +81,28 @@ export default async function SessionDetailPage({
             </CardContent>
           )}
         </Card>
+
+        {techniques.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-3">
+              Techniques ({techniques.length})
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {techniques.map((st) => {
+                const technique = st.expand?.technique_id;
+                if (!technique) return null;
+                return (
+                  <div key={st.id} className="flex flex-col rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 text-sm">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{technique.name}</span>
+                    {technique.category && (
+                      <span className="text-xs text-muted-foreground">{technique.category}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
           Rolling Rounds ({rounds.length})
