@@ -6,9 +6,11 @@ export async function GET(
 ) {
   const { id } = await params;
   const pb = createServerClient();
-  const rounds = await pb.collection("rolling_rounds").getFullList({
-    filter: `session_id = "${id}"`,
-    sort: "created",
-  });
+  const { items: rounds } = await pb
+    .collection("rolling_rounds")
+    .getList(1, 200, {
+      filter: `session_id = "${id}"`,
+      sort: "created",
+    });
   return Response.json(rounds);
 }

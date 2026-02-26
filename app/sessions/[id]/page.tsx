@@ -24,13 +24,15 @@ const OUTCOME_COLORS: Record<string, string> = {
 
 async function getSession(id: string) {
   const pb = createServerClient();
-  const [session, rounds] = await Promise.all([
-    pb.collection("sessions").getOne<SessionWithGym>(id, { expand: "gym_id" }),
-    pb.collection("rolling_rounds").getFullList({
+  const session = await pb
+    .collection("sessions")
+    .getOne<SessionWithGym>(id, { expand: "gym_id" });
+  const { items: rounds } = await pb
+    .collection("rolling_rounds")
+    .getList(1, 200, {
       filter: `session_id = "${id}"`,
       sort: "created",
-    }),
-  ]);
+    });
   return { session, rounds };
 }
 
