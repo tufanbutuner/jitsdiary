@@ -2,6 +2,7 @@ import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
 import { getSessionById, getRoundsForSession } from "@/lib/pocketbase-server";
 import EditSessionModal from "@/components/EditSessionModal";
 import LogTechniquesModal from "@/components/LogTechniquesModal";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
@@ -48,35 +49,37 @@ export default async function SessionDetailPage({
           <EditSessionModal session={session} />
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 mb-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                {new Date(session.date).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                {gym?.name ?? "No gym"}
-                {session.duration_minutes
-                  ? ` · ${session.duration_minutes} min`
-                  : ""}
-                {session.coach ? ` · ${session.coach}` : ""}
-              </p>
-            </div>
-            <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type}
-            </span>
-          </div>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-xl">
+              {new Date(session.date).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </CardTitle>
+            <CardDescription>
+              {gym?.name ?? "No gym"}
+              {session.duration_minutes
+                ? ` · ${session.duration_minutes} min`
+                : ""}
+              {session.coach ? ` · ${session.coach}` : ""}
+            </CardDescription>
+            <CardAction>
+              <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type}
+              </span>
+            </CardAction>
+          </CardHeader>
           {session.notes && (
-            <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-              {session.notes}
-            </p>
+            <CardContent className="pt-0">
+              <p className="text-sm text-muted-foreground">
+                {session.notes}
+              </p>
+            </CardContent>
           )}
-        </div>
+        </Card>
 
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
           Rolling Rounds ({rounds.length})

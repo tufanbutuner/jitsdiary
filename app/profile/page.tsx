@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createServerClient } from "@/lib/pocketbase-server";
 import { GymsResponse, ProfilesResponse } from "@/types/pocketbase";
 import EditProfileForm from "@/components/EditProfileForm";
+import { Card, CardContent } from "@/components/ui/card";
 
 type ProfileWithGym = ProfilesResponse<{ gym_id: GymsResponse }>;
 
@@ -36,20 +37,22 @@ export default async function ProfilePage() {
 
         {/* Belt display */}
         {profile?.belt && (
-          <div className="flex items-center gap-4 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div className={`h-10 w-10 rounded-full ${BELT_COLORS[profile.belt]}`} />
-            <div>
-              <p className="font-medium capitalize text-zinc-900 dark:text-zinc-50">
-                {profile.belt} Belt
-              </p>
-              <p className="text-sm text-zinc-500">
-                {profile.stripes
-                  ? `${profile.stripes} stripe${profile.stripes > 1 ? "s" : ""}`
-                  : "No stripes"}
-                {profile.expand?.gym_id ? ` · ${profile.expand.gym_id.name}` : ""}
-              </p>
-            </div>
-          </div>
+          <Card className="py-4">
+            <CardContent className="flex items-center gap-4 py-0">
+              <div className={`h-10 w-10 rounded-full ${BELT_COLORS[profile.belt]}`} />
+              <div>
+                <p className="font-medium capitalize">
+                  {profile.belt} Belt
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {profile.stripes
+                    ? `${profile.stripes} stripe${profile.stripes > 1 ? "s" : ""}`
+                    : "No stripes"}
+                  {profile.expand?.gym_id ? ` · ${profile.expand.gym_id.name}` : ""}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         <EditProfileForm profile={profile} gyms={gyms} />

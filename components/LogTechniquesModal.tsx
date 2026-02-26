@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Technique {
   id: string;
@@ -117,17 +118,18 @@ export default function LogTechniquesModal({ sessionId }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 flex flex-col max-h-[85vh]">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Log Techniques</h2>
+          <Card className="w-full max-w-lg shadow-xl flex flex-col max-h-[85vh]">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle>Log Techniques</CardTitle>
               <button
                 onClick={handleClose}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xl leading-none"
+                className="text-muted-foreground hover:text-foreground text-xl leading-none"
+                type="button"
               >
                 ×
               </button>
-            </div>
-
+            </CardHeader>
+            <CardContent className="flex flex-col flex-1 min-h-0 overflow-hidden">
             {logged.length > 0 && (
               <div className="mb-4">
                 <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">Already logged</p>
@@ -185,7 +187,7 @@ export default function LogTechniquesModal({ sessionId }: Props) {
             {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
             <div className="flex items-center justify-between mt-5 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-muted-foreground">
                 {selected.size > 0 ? `${selected.size} selected` : ""}
               </span>
               <div className="flex gap-3">
@@ -195,7 +197,8 @@ export default function LogTechniquesModal({ sessionId }: Props) {
                 </Button>
               </div>
             </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>

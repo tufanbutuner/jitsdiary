@@ -31,24 +31,30 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <ThemeProvider>
-          <header className="flex items-center justify-between px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <div className="flex items-center gap-6">
-              <Link href="/" className="font-semibold text-zinc-900 dark:text-zinc-50">JitsDiary</Link>
-              <Link href="/sessions" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">Sessions</Link>
-              <Link href="/profile" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">Profile</Link>
-            </div>
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <SignedOut>
-                <SignInButton mode="modal" />
-                <SignUpButton mode="modal" />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-            </div>
-          </header>
-          {children}
+            <header className="flex items-center justify-between px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div className="flex items-center gap-6">
+                <Link href="/" className="font-semibold text-zinc-900 dark:text-zinc-50">
+                  JitsDiary
+                </Link>
+                <Link href="/sessions" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
+                  Sessions
+                </Link>
+                <Link href="/profile" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
+                  Profile
+                </Link>
+              </div>
+              <div className="flex items-center gap-3">
+                <ThemeToggle />
+                <SignedOut>
+                  <SignInButton mode="modal" />
+                  <SignUpButton mode="modal" />
+                </SignedOut>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+              </div>
+            </header>
+            {children}
           </ThemeProvider>
         </body>
       </html>

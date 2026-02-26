@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Gym {
   id: string;
@@ -95,17 +96,18 @@ export default function EditSessionModal({ session }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Edit Session</h2>
+          <Card className="w-full max-w-md shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle>Edit Session</CardTitle>
               <button
                 onClick={() => setOpen(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-xl leading-none"
+                className="text-muted-foreground hover:text-foreground text-xl leading-none"
+                type="button"
               >
                 ×
               </button>
-            </div>
-
+            </CardHeader>
+            <CardContent>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Date</label>
@@ -163,7 +165,8 @@ export default function EditSessionModal({ session }: Props) {
                 <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Changes"}</Button>
               </div>
             </form>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </>

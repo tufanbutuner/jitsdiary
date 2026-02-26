@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Gym {
   id: string;
@@ -79,7 +80,9 @@ export default function EditProfileForm({ profile, gyms }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 flex flex-col gap-5">
+    <Card>
+      <CardContent className="pt-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Display name</label>
         <Input type="text" name="display_name" value={form.display_name} onChange={handleChange} placeholder="e.g. Tufan" />
@@ -139,5 +142,7 @@ export default function EditProfileForm({ profile, gyms }: Props) {
         <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save Profile"}</Button>
       </div>
     </form>
+      </CardContent>
+    </Card>
   );
 }
