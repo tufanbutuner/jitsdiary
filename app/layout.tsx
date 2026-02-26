@@ -32,6 +32,7 @@ export default function RootLayout({
             <div className="flex items-center gap-6">
               <Link href="/" className="font-semibold text-zinc-900 dark:text-zinc-50">JitsDiary</Link>
               <Link href="/sessions" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">Sessions</Link>
+              <Link href="/profile" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">Profile</Link>
             </div>
             <div className="flex items-center gap-3">
               <SignedOut>

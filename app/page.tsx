@@ -2,8 +2,19 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getSessionsForUser } from "@/lib/pocketbase-server";
-import { GymsResponse, SessionsResponse } from "@/types/pocketbase";
+import { GymsResponse, ProfilesResponse, SessionsResponse } from "@/types/pocketbase";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { createServerClient } from "@/lib/pocketbase-server";
+
+type ProfileWithGym = ProfilesResponse<{ gym_id: GymsResponse }>;
+
+const BELT_COLORS: Record<string, string> = {
+  white: "bg-white border border-zinc-300",
+  blue: "bg-blue-600",
+  purple: "bg-purple-600",
+  brown: "bg-amber-800",
+  black: "bg-zinc-900 dark:bg-zinc-600",
+};
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
@@ -64,7 +75,15 @@ export default async function Home() {
   }
 
 
-  const sessions = (await getSessionsForUser(userId)) as SessionWithGym[];
+  const pb = createServerClient();
+  const [sessions, { items: profiles }] = await Promise.all([
+    getSessionsForUser(userId) as Promise<SessionWithGym[]>,
+    pb.collection("profiles").getList(1, 1, {
+      filter: `user_id = "${userId}"`,
+      expand: "gym_id",
+    }),
+  ]);
+  const profile = (profiles[0] as ProfileWithGym) ?? null;
 
   const now = new Date();
   const startOfWeek = new Date(now);
@@ -85,8 +104,45 @@ export default async function Home() {
       <div className="max-w-3xl mx-auto space-y-8">
 
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-          Dashboard
+          {profile?.display_name ? `Welcome back, ${profile.display_name}` : "Dashboard"}
         </h1>
+
+        {/* Profile summary */}
+        {profile ? (
+          <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-4">
+              {profile.belt && (
+                <div className={`h-8 w-8 rounded-full ${BELT_COLORS[profile.belt]}`} />
+              )}
+              <div>
+                <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                  {profile.display_name ?? "Your Profile"}
+                </p>
+                <p className="text-sm text-zinc-500">
+                  {profile.belt
+                    ? `${profile.belt.charAt(0).toUpperCase() + profile.belt.slice(1)} belt`
+                    : "No belt set"}
+                  {profile.stripes ? ` · ${profile.stripes} stripe${profile.stripes > 1 ? "s" : ""}` : ""}
+                  {profile.expand?.gym_id ? ` · ${profile.expand.gym_id.name}` : ""}
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/profile"
+              className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+            >
+              Edit &rarr;
+            </Link>
+          </div>
+        ) : (
+          <Link
+            href="/profile"
+            className="flex items-center justify-between rounded-xl border border-dashed border-zinc-300 bg-white px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900 hover:border-zinc-400 transition"
+          >
+            <p className="text-sm text-zinc-500">Set up your profile — add your belt and home gym</p>
+            <span className="text-sm text-zinc-400">&rarr;</span>
+          </Link>
+        )}
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-4">

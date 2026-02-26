@@ -13,6 +13,7 @@ export enum Collections {
 	Superusers = "_superusers",
 	BeltProgressions = "belt_progressions",
 	Gyms = "gyms",
+	Profiles = "profiles",
 	RollingRounds = "rolling_rounds",
 	SessionTechniques = "session_techniques",
 	Sessions = "sessions",
@@ -121,6 +122,25 @@ export type GymsRecord = {
 	name: string
 }
 
+export enum ProfilesBeltOptions {
+	"white" = "white",
+	"blue" = "blue",
+	"purple" = "purple",
+	"brown" = "brown",
+	"black" = "black",
+}
+
+export type ProfilesRecord = {
+	belt?: ProfilesBeltOptions
+	created: IsoAutoDateString
+	display_name?: string
+	gym_id?: RecordIdString
+	id: string
+	stripes?: number
+	updated: IsoAutoDateString
+	user_id: string
+}
+
 export enum RollingRoundsPartnerBeltOptions {
 	"white" = "white",
 	"blue" = "blue",
@@ -204,6 +224,7 @@ export type OtpsResponse<Texpand = unknown> = Required<OtpsRecord> & BaseSystemF
 export type SuperusersResponse<Texpand = unknown> = Required<SuperusersRecord> & AuthSystemFields<Texpand>
 export type BeltProgressionsResponse<Texpand = unknown> = Required<BeltProgressionsRecord> & BaseSystemFields<Texpand>
 export type GymsResponse<Texpand = unknown> = Required<GymsRecord> & BaseSystemFields<Texpand>
+export type ProfilesResponse<Texpand = unknown> = Required<ProfilesRecord> & BaseSystemFields<Texpand>
 export type RollingRoundsResponse<Texpand = unknown> = Required<RollingRoundsRecord> & BaseSystemFields<Texpand>
 export type SessionTechniquesResponse<Texpand = unknown> = Required<SessionTechniquesRecord> & BaseSystemFields<Texpand>
 export type SessionsResponse<Texpand = unknown> = Required<SessionsRecord> & BaseSystemFields<Texpand>
@@ -220,6 +241,7 @@ export type CollectionRecords = {
 	_superusers: SuperusersRecord
 	belt_progressions: BeltProgressionsRecord
 	gyms: GymsRecord
+	profiles: ProfilesRecord
 	rolling_rounds: RollingRoundsRecord
 	session_techniques: SessionTechniquesRecord
 	sessions: SessionsRecord
@@ -235,6 +257,7 @@ export type CollectionResponses = {
 	_superusers: SuperusersResponse
 	belt_progressions: BeltProgressionsResponse
 	gyms: GymsResponse
+	profiles: ProfilesResponse
 	rolling_rounds: RollingRoundsResponse
 	session_techniques: SessionTechniquesResponse
 	sessions: SessionsResponse
