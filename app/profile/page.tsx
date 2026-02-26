@@ -32,8 +32,8 @@ export default async function ProfilePage() {
   const profile = (profiles[0] as ProfileWithGym) ?? null;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
-      <div className="max-w-lg mx-auto space-y-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
+      <div className="max-w-lg mx-auto space-y-6 sm:space-y-8">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Profile</h1>
 
         {/* Belt display */}

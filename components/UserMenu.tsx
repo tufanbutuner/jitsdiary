@@ -37,7 +37,7 @@ export default function UserMenu({ isLoggedIn, userEmail }: UserMenuProps) {
 
   return (
     <div className="flex items-center gap-3">
-      {userEmail && <span className="text-sm text-zinc-500 dark:text-zinc-400">{userEmail}</span>}
+      {userEmail && <span className="hidden sm:inline text-sm text-zinc-500 dark:text-zinc-400">{userEmail}</span>}
       <button
         onClick={handleSignOut}
         className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 transition dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"

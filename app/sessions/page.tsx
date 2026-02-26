@@ -25,7 +25,7 @@ export default async function SessionsPage() {
   const sessions = await getSessions(authUser.userId);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">

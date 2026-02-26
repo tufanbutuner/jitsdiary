@@ -34,8 +34,8 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider>
-          <header className="flex items-center justify-between px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-            <div className="flex items-center gap-6">
+          <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <div className="flex items-center gap-4 sm:gap-6">
               <Link href="/" className="font-semibold text-zinc-900 dark:text-zinc-50">
                 JitsDiary
               </Link>
@@ -46,7 +46,7 @@ export default async function RootLayout({
                 Profile
               </Link>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <ThemeToggle />
               <UserMenu isLoggedIn={!!authUser} userEmail={userEmail} />
             </div>

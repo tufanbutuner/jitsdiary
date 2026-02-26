@@ -29,8 +29,8 @@ export default async function Home() {
   if (!authUser) {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
-        <main className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-          <h1 className="text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-4">Your BJJ training diary.</h1>
+        <main className="flex-1 flex flex-col items-center justify-center px-6 sm:px-8 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-4">Your BJJ training diary.</h1>
           <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-md mb-10">Log every session, track your rounds, and build your technique library — all in one place.</p>
 
           <div className="flex gap-3">
@@ -91,8 +91,8 @@ export default async function Home() {
   const recentSessions = sessions.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
+      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{profile?.display_name ? `Welcome back, ${profile.display_name}` : "Dashboard"}</h1>
 
         {/* Profile summary */}
@@ -132,7 +132,7 @@ export default async function Home() {
         )}
 
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
           <Card className="py-4">
             <CardContent className="py-0">
               <p className="text-sm text-muted-foreground">Sessions this week</p>
@@ -154,7 +154,7 @@ export default async function Home() {
         </div>
 
         {/* Calendar + Recent sessions */}
-        <div className="grid grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           {/* Calendar */}
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">Training Calendar</h2>

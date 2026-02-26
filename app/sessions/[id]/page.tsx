@@ -43,7 +43,7 @@ export default async function SessionDetailPage({
   const gym = session.expand?.gym_id;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-end gap-3">
           <LogTechniquesModal sessionId={id} />
@@ -111,62 +111,72 @@ export default async function SessionDetailPage({
         {rounds.length === 0 ? (
           <p className="text-zinc-500 text-sm">No rolling rounds recorded.</p>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
-            <table className="w-full text-sm">
-              <thead className="bg-zinc-50 dark:bg-zinc-800">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-                    Partner
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-                    Belt
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-                    Outcome
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-                    Duration
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-                    Notes
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200 bg-white dark:divide-zinc-800 dark:bg-zinc-900">
-                {rounds.map((round) => (
-                  <tr key={round.id}>
-                    <td className="px-4 py-3 text-zinc-900 dark:text-zinc-100">
-                      {round.partner_name || "—"}
-                    </td>
-                    <td className="px-4 py-3 capitalize text-zinc-600 dark:text-zinc-400">
-                      {round.partner_belt
-                        ? `${round.partner_belt}${round.partner_stripe ? ` (${round.partner_stripe}s)` : ""}`
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {round.outcome ? (
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${OUTCOME_COLORS[round.outcome] ?? ""}`}
-                        >
-                          {OUTCOME_LABELS[round.outcome] ?? round.outcome}
-                        </span>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                      {round.duration_seconds
-                        ? `${Math.floor(round.duration_seconds / 60)}m ${round.duration_seconds % 60}s`
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
-                      {round.notes || "—"}
-                    </td>
+          <>
+            {/* Mobile cards */}
+            <ul className="sm:hidden space-y-3">
+              {rounds.map((round) => (
+                <li key={round.id} className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3 text-sm space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-100">{round.partner_name || "Unknown partner"}</span>
+                    {round.outcome && (
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${OUTCOME_COLORS[round.outcome] ?? ""}`}>
+                        {OUTCOME_LABELS[round.outcome] ?? round.outcome}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-zinc-500 dark:text-zinc-400 capitalize">
+                    {round.partner_belt
+                      ? `${round.partner_belt}${round.partner_stripe ? ` · ${round.partner_stripe}s` : ""}`
+                      : "Belt unknown"}
+                    {round.duration_seconds
+                      ? ` · ${Math.floor(round.duration_seconds / 60)}m ${round.duration_seconds % 60}s`
+                      : ""}
+                  </div>
+                  {round.notes && <p className="text-zinc-500 dark:text-zinc-400">{round.notes}</p>}
+                </li>
+              ))}
+            </ul>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+              <table className="w-full text-sm">
+                <thead className="bg-zinc-50 dark:bg-zinc-800">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">Partner</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">Belt</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">Outcome</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">Duration</th>
+                    <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">Notes</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-zinc-200 bg-white dark:divide-zinc-800 dark:bg-zinc-900">
+                  {rounds.map((round) => (
+                    <tr key={round.id}>
+                      <td className="px-4 py-3 text-zinc-900 dark:text-zinc-100">{round.partner_name || "—"}</td>
+                      <td className="px-4 py-3 capitalize text-zinc-600 dark:text-zinc-400">
+                        {round.partner_belt
+                          ? `${round.partner_belt}${round.partner_stripe ? ` (${round.partner_stripe}s)` : ""}`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        {round.outcome ? (
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${OUTCOME_COLORS[round.outcome] ?? ""}`}>
+                            {OUTCOME_LABELS[round.outcome] ?? round.outcome}
+                          </span>
+                        ) : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
+                        {round.duration_seconds
+                          ? `${Math.floor(round.duration_seconds / 60)}m ${round.duration_seconds % 60}s`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">{round.notes || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>
