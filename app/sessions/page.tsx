@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
+import { createServerClient } from "@/lib/pocketbase-server";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
@@ -9,17 +10,17 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
   open_mat: "Open Mat",
 };
 
-async function getSessions(): Promise<{ items: SessionWithGym[] }> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/sessions`,
-    { cache: "no-store" }
-  );
-  if (!res.ok) throw new Error("Failed to fetch sessions");
-  return res.json();
+async function getSessions(): Promise<SessionWithGym[]> {
+  const pb = createServerClient();
+  const result = await pb.collection("sessions").getList<SessionWithGym>(1, 20, {
+    expand: "gym_id",
+    sort: "-date",
+  });
+  return result.items;
 }
 
 export default async function SessionsPage() {
-  const { items: sessions } = await getSessions();
+  const sessions = await getSessions();
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">

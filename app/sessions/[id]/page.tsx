@@ -1,16 +1,8 @@
 import Link from "next/link";
-import {
-  SessionsResponse,
-  GymsResponse,
-  RollingRoundsResponse,
-} from "@/types/pocketbase";
+import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
+import { createServerClient } from "@/lib/pocketbase-server";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
-
-interface SessionDetail {
-  session: SessionWithGym;
-  rounds: RollingRoundsResponse[];
-}
 
 const SESSION_TYPE_LABELS: Record<string, string> = {
   gi: "Gi",
@@ -30,13 +22,16 @@ const OUTCOME_COLORS: Record<string, string> = {
   draw: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
 };
 
-async function getSession(id: string): Promise<SessionDetail> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/sessions/${id}`,
-    { cache: "no-store" }
-  );
-  if (!res.ok) throw new Error("Failed to fetch session");
-  return res.json();
+async function getSession(id: string) {
+  const pb = createServerClient();
+  const [session, rounds] = await Promise.all([
+    pb.collection("sessions").getOne<SessionWithGym>(id, { expand: "gym_id" }),
+    pb.collection("rolling_rounds").getFullList({
+      filter: `session_id = "${id}"`,
+      sort: "created",
+    }),
+  ]);
+  return { session, rounds };
 }
 
 export default async function SessionDetailPage({
