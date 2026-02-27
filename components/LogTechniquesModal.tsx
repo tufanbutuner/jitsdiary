@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,18 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
-interface Technique {
-  id: string;
-  name: string;
-  category: string;
-}
-
-interface SessionTechnique {
-  id: string;
-  technique_id: string;
-  expand: { technique_id: Technique };
-}
+import { useTechniques, type Technique } from "@/hooks/useTechniques";
 
 interface Props {
   sessionId: string;
@@ -49,22 +38,10 @@ export default function LogTechniquesModal({ sessionId }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [comboOpen, setComboOpen] = useState(false);
-  const [library, setLibrary] = useState<Technique[]>([]);
-  const [logged, setLogged] = useState<SessionTechnique[]>([]);
   const [selected, setSelected] = useState<Technique[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!open) return;
-    Promise.all([
-      fetch("/api/techniques").then((r) => r.json()),
-      fetch(`/api/sessions/${sessionId}/techniques`).then((r) => r.json()),
-    ]).then(([lib, log]) => {
-      setLibrary(lib);
-      setLogged(log);
-    }).catch(() => {});
-  }, [open, sessionId]);
+  const { library, logged, submitting, error, logTechniques, removeTechnique } =
+    useTechniques(sessionId, open);
 
   const loggedIds = useMemo(() => new Set(logged.map((l) => l.technique_id)), [logged]);
   const selectedIds = useMemo(() => new Set(selected.map((t) => t.id)), [selected]);
@@ -91,32 +68,17 @@ export default function LogTechniquesModal({ sessionId }: Props) {
     );
   }
 
-  async function handleRemove(st: SessionTechnique) {
-    await fetch(`/api/sessions/${sessionId}/techniques/${st.id}`, { method: "DELETE" });
-    setLogged((prev) => prev.filter((l) => l.id !== st.id));
+  async function handleRemove(st: Parameters<typeof removeTechnique>[0]) {
+    await removeTechnique(st);
     router.refresh();
   }
 
   async function handleSave() {
     if (selected.length === 0) return;
-    setSubmitting(true);
-    setError("");
-    try {
-      const ids = selected.map((t) => t.id);
-const res = await fetch(`/api/sessions/${sessionId}/techniques`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ technique_ids: ids }),
-      });
-      if (!res.ok) throw new Error("Failed to log techniques");
+    const ok = await logTechniques(selected.map((t) => t.id));
+    if (ok) {
       setSelected([]);
-      const updated = await fetch(`/api/sessions/${sessionId}/techniques`).then((r) => r.json());
-      setLogged(updated);
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setSubmitting(false);
     }
   }
 

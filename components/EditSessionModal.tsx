@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,11 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Gym {
-  id: string;
-  name: string;
-}
+import { useGyms } from "@/hooks/useGyms";
+import { useSessions } from "@/hooks/useSessions";
 
 interface Props {
   session: {
@@ -34,9 +31,6 @@ interface Props {
 export default function EditSessionModal({ session }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [gyms, setGyms] = useState<Gym[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     date: session.date.slice(0, 10),
@@ -47,13 +41,8 @@ export default function EditSessionModal({ session }: Props) {
     notes: session.notes ?? "",
   });
 
-  useEffect(() => {
-    if (!open) return;
-    fetch("/api/gyms")
-      .then((r) => r.json())
-      .then(setGyms)
-      .catch(() => {});
-  }, [open]);
+  const gyms = useGyms(open);
+  const { submitting, error, updateSession } = useSessions();
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -67,26 +56,10 @@ export default function EditSessionModal({ session }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/sessions/${session.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        let message = "Failed to update session";
-        try { message = JSON.parse(text).error ?? message; } catch {}
-        throw new Error(message);
-      }
+    const ok = await updateSession(session.id, form);
+    if (ok) {
       setOpen(false);
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setSubmitting(false);
     }
   }
 

@@ -12,19 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { useBeltProgressions, type BeltProgression } from "@/hooks/useBeltProgressions";
 
 interface Gym {
   id: string;
   name: string;
-}
-
-interface BeltProgression {
-  id: string;
-  belt: string;
-  stripes: number;
-  promoted_on: string;
-  gym_id?: string;
-  notes?: string;
 }
 
 interface Props {
@@ -61,9 +53,9 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
   const [progressions, setProgressions] = useState(initial);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { saving, error, deletingId, createProgression, deleteProgression } =
+    useBeltProgressions();
 
   function handleSelect(name: string, value: string) {
     setForm((f) => ({ ...f, [name]: value === "none" ? "" : value }));
@@ -71,19 +63,8 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSaving(true);
-    setError("");
-    try {
-      const res = await fetch("/api/belt-progressions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Failed to save");
-      }
-      const record = await res.json();
+    const record = await createProgression(form);
+    if (record) {
       setProgressions((prev) =>
         [...prev, record].sort(
           (a, b) => new Date(a.promoted_on).getTime() - new Date(b.promoted_on).getTime()
@@ -92,21 +73,14 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
       setForm(EMPTY_FORM);
       setShowForm(false);
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setSaving(false);
     }
   }
 
   async function handleDelete(id: string) {
-    setDeletingId(id);
-    try {
-      await fetch(`/api/belt-progressions/${id}`, { method: "DELETE" });
+    const ok = await deleteProgression(id);
+    if (ok) {
       setProgressions((prev) => prev.filter((p) => p.id !== id));
       router.refresh();
-    } finally {
-      setDeletingId(null);
     }
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface Gym {
-  id: string;
-  name: string;
-}
+import { useGyms } from "@/hooks/useGyms";
+import { useProfile } from "@/hooks/useProfile";
+import { useSessions } from "@/hooks/useSessions";
 
 export default function NewSessionModal() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [gyms, setGyms] = useState<Gym[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     date: new Date().toISOString().slice(0, 10),
@@ -35,20 +30,11 @@ export default function NewSessionModal() {
     notes: "",
   });
 
-  useEffect(() => {
-    if (!open) return;
-    Promise.all([
-      fetch("/api/gyms").then((r) => r.json()),
-      fetch("/api/profile").then((r) => r.json()),
-    ])
-      .then(([gymList, profile]) => {
-        setGyms(gymList);
-        if (profile?.gym_id) {
-          setForm((f) => ({ ...f, gym_id: profile.gym_id }));
-        }
-      })
-      .catch(() => {});
-  }, [open]);
+  const gyms = useGyms(open);
+  const profile = useProfile(open);
+  const { submitting, error, createSession } = useSessions();
+
+  const gym_id = form.gym_id || profile?.gym_id || "";
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -62,26 +48,10 @@ export default function NewSessionModal() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    setError("");
-    try {
-      const res = await fetch("/api/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        let message = "Failed to create session";
-        try { message = JSON.parse(text).error ?? message; } catch {}
-        throw new Error(message);
-      }
+    const ok = await createSession({ ...form, gym_id });
+    if (ok) {
       setOpen(false);
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setSubmitting(false);
     }
   }
 
@@ -125,7 +95,7 @@ export default function NewSessionModal() {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Gym</label>
-                <Select value={form.gym_id || "none"} onValueChange={(v) => handleSelect("gym_id", v)}>
+                <Select value={gym_id || "none"} onValueChange={(v) => handleSelect("gym_id", v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="No gym" />
                   </SelectTrigger>
