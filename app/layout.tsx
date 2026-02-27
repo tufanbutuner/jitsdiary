@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import QueryProvider from "@/components/QueryProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import UserMenu from "@/components/UserMenu";
 import { getAuthUser } from "@/lib/auth";
@@ -33,6 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <QueryProvider>
         <ThemeProvider>
           <header className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <div className="flex items-center gap-4 sm:gap-6">
@@ -53,6 +55,7 @@ export default async function RootLayout({
           </header>
           {children}
         </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

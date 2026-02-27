@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface Technique {
   id: string;
@@ -15,53 +15,76 @@ export interface SessionTechnique {
 }
 
 export function useTechniques(sessionId: string, enabled: boolean) {
-  const [library, setLibrary] = useState<Technique[]>([]);
-  const [logged, setLogged] = useState<SessionTechnique[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!enabled) return;
-    Promise.all([
-      fetch("/api/techniques").then((r) => r.json()),
+  const { data: library = [] } = useQuery<Technique[]>({
+    queryKey: ["techniques"],
+    queryFn: () => fetch("/api/techniques").then((r) => r.json()),
+    enabled,
+  });
+
+  const { data: logged = [] } = useQuery<SessionTechnique[]>({
+    queryKey: ["session-techniques", sessionId],
+    queryFn: () =>
       fetch(`/api/sessions/${sessionId}/techniques`).then((r) => r.json()),
-    ])
-      .then(([lib, log]) => {
-        setLibrary(lib);
-        setLogged(log);
-      })
-      .catch(() => {});
-  }, [enabled, sessionId]);
+    enabled,
+  });
 
-  async function logTechniques(techniqueIds: string[]): Promise<boolean> {
-    setSubmitting(true);
-    setError("");
-    try {
-      const res = await fetch(`/api/sessions/${sessionId}/techniques`, {
+  const logMutation = useMutation({
+    mutationFn: (techniqueIds: string[]) =>
+      fetch(`/api/sessions/${sessionId}/techniques`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ technique_ids: techniqueIds }),
-      });
-      if (!res.ok) throw new Error("Failed to log techniques");
-      const updated: SessionTechnique[] = await fetch(
-        `/api/sessions/${sessionId}/techniques`
-      ).then((r) => r.json());
-      setLogged(updated);
+      }).then((r) => {
+        if (!r.ok) throw new Error("Failed to log techniques");
+        return r.json();
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["session-techniques", sessionId] });
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: (st: SessionTechnique) =>
+      fetch(`/api/sessions/${sessionId}/techniques/${st.id}`, {
+        method: "DELETE",
+      }),
+    onMutate: async (st) => {
+      await queryClient.cancelQueries({ queryKey: ["session-techniques", sessionId] });
+      const previous = queryClient.getQueryData<SessionTechnique[]>(["session-techniques", sessionId]);
+      queryClient.setQueryData<SessionTechnique[]>(
+        ["session-techniques", sessionId],
+        (old = []) => old.filter((l) => l.id !== st.id)
+      );
+      return { previous };
+    },
+    onError: (_err, _st, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(["session-techniques", sessionId], context.previous);
+      }
+    },
+  });
+
+  async function logTechniques(techniqueIds: string[]): Promise<boolean> {
+    try {
+      await logMutation.mutateAsync(techniqueIds);
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    } catch {
       return false;
-    } finally {
-      setSubmitting(false);
     }
   }
 
   async function removeTechnique(st: SessionTechnique): Promise<void> {
-    await fetch(`/api/sessions/${sessionId}/techniques/${st.id}`, {
-      method: "DELETE",
-    });
-    setLogged((prev) => prev.filter((l) => l.id !== st.id));
+    await removeMutation.mutateAsync(st);
   }
 
-  return { library, logged, submitting, error, logTechniques, removeTechnique };
+  return {
+    library,
+    logged,
+    submitting: logMutation.isPending,
+    error: logMutation.error?.message ?? "",
+    logTechniques,
+    removeTechnique,
+  };
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 export interface Gym {
   id: string;
@@ -8,15 +8,10 @@ export interface Gym {
 }
 
 export function useGyms(enabled: boolean) {
-  const [gyms, setGyms] = useState<Gym[]>([]);
-
-  useEffect(() => {
-    if (!enabled) return;
-    fetch("/api/gyms")
-      .then((r) => r.json())
-      .then(setGyms)
-      .catch(() => {});
-  }, [enabled]);
-
-  return gyms;
+  const { data = [] } = useQuery<Gym[]>({
+    queryKey: ["gyms"],
+    queryFn: () => fetch("/api/gyms").then((r) => r.json()),
+    enabled,
+  });
+  return data;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface Profile {
   gym_id?: string;
@@ -10,15 +10,10 @@ interface Profile {
 }
 
 export function useProfile(enabled: boolean) {
-  const [profile, setProfile] = useState<Profile | null>(null);
-
-  useEffect(() => {
-    if (!enabled) return;
-    fetch("/api/profile")
-      .then((r) => r.json())
-      .then(setProfile)
-      .catch(() => {});
-  }, [enabled]);
-
-  return profile;
+  const { data = null } = useQuery<Profile | null>({
+    queryKey: ["profile"],
+    queryFn: () => fetch("/api/profile").then((r) => r.json()),
+    enabled,
+  });
+  return data;
 }

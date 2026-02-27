@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 interface BeltProgressionFormData {
   belt: string;
@@ -20,16 +20,8 @@ export interface BeltProgression {
 }
 
 export function useBeltProgressions() {
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  async function createProgression(
-    data: BeltProgressionFormData
-  ): Promise<BeltProgression | null> {
-    setSaving(true);
-    setError("");
-    try {
+  const createMutation = useMutation({
+    mutationFn: async (data: BeltProgressionFormData): Promise<BeltProgression> => {
       const res = await fetch("/api/belt-progressions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,24 +31,39 @@ export function useBeltProgressions() {
         const json = await res.json();
         throw new Error(json.error ?? "Failed to save");
       }
-      return await res.json();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      return res.json();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/belt-progressions/${id}`, { method: "DELETE" }),
+  });
+
+  async function createProgression(
+    data: BeltProgressionFormData
+  ): Promise<BeltProgression | null> {
+    try {
+      return await createMutation.mutateAsync(data);
+    } catch {
       return null;
-    } finally {
-      setSaving(false);
     }
   }
 
   async function deleteProgression(id: string): Promise<boolean> {
-    setDeletingId(id);
     try {
-      await fetch(`/api/belt-progressions/${id}`, { method: "DELETE" });
+      await deleteMutation.mutateAsync(id);
       return true;
-    } finally {
-      setDeletingId(null);
+    } catch {
+      return false;
     }
   }
 
-  return { saving, error, deletingId, createProgression, deleteProgression };
+  return {
+    saving: createMutation.isPending,
+    error: createMutation.error?.message ?? "",
+    deletingId: deleteMutation.isPending ? deleteMutation.variables ?? null : null,
+    createProgression,
+    deleteProgression,
+  };
 }

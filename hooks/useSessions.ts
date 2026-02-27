@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 interface SessionFormData {
   date: string;
@@ -11,64 +11,52 @@ interface SessionFormData {
   notes: string;
 }
 
-interface UseMutationResult {
-  submitting: boolean;
-  error: string;
-  createSession: (data: SessionFormData) => Promise<boolean>;
-  updateSession: (id: string, data: SessionFormData) => Promise<boolean>;
+async function fetchSession(url: string, method: string, data: SessionFormData) {
+  const res = await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    let message = method === "POST" ? "Failed to create session" : "Failed to update session";
+    try { message = JSON.parse(text).error ?? message; } catch {}
+    throw new Error(message);
+  }
+  return res.json();
 }
 
-export function useSessions(): UseMutationResult {
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+export function useSessions() {
+  const createMutation = useMutation({
+    mutationFn: (data: SessionFormData) => fetchSession("/api/sessions", "POST", data),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: SessionFormData }) =>
+      fetchSession(`/api/sessions/${id}`, "PATCH", data),
+  });
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
+  const error =
+    createMutation.error?.message ?? updateMutation.error?.message ?? "";
 
   async function createSession(data: SessionFormData): Promise<boolean> {
-    setSubmitting(true);
-    setError("");
     try {
-      const res = await fetch("/api/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        let message = "Failed to create session";
-        try { message = JSON.parse(text).error ?? message; } catch {}
-        throw new Error(message);
-      }
+      await createMutation.mutateAsync(data);
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    } catch {
       return false;
-    } finally {
-      setSubmitting(false);
     }
   }
 
   async function updateSession(id: string, data: SessionFormData): Promise<boolean> {
-    setSubmitting(true);
-    setError("");
     try {
-      const res = await fetch(`/api/sessions/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        let message = "Failed to update session";
-        try { message = JSON.parse(text).error ?? message; } catch {}
-        throw new Error(message);
-      }
+      await updateMutation.mutateAsync({ id, data });
       return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    } catch {
       return false;
-    } finally {
-      setSubmitting(false);
     }
   }
 
-  return { submitting, error, createSession, updateSession };
+  return { submitting: isPending, error, createSession, updateSession };
 }
