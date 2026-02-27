@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import QueryProvider from "@/components/QueryProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import UserMenu from "@/components/UserMenu";
+import FirebaseAnalytics from "@/components/FirebaseAnalytics";
 import { getAuthUser } from "@/lib/auth";
 import "./globals.css";
 
@@ -54,6 +55,7 @@ export default async function RootLayout({
             </div>
           </header>
           {children}
+          <FirebaseAnalytics />
         </ThemeProvider>
         </QueryProvider>
       </body>
