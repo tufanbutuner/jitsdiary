@@ -1,4 +1,5 @@
 import SessionCalendar from "@/components/SessionCalendar";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -53,14 +54,12 @@ export default async function Home() {
 
           <div className="flex gap-3">
             <Link href="/sign-up">
-              <button className="rounded-lg bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 transition dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
-                Get started free
-              </button>
+              <Button color="black">Get started free</Button>
             </Link>
             <Link href="/sign-in">
-              <button className="rounded-lg border border-zinc-200 px-6 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 transition dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+              <Button variant={"secondary"} color="black">
                 Sign in
-              </button>
+              </Button>
             </Link>
           </div>
 
