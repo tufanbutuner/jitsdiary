@@ -39,16 +39,15 @@ export async function POST(
   });
   const existingIds = new Set(existing.map((e) => e.technique_id));
 
-  const created = await Promise.all(
-    techniqueIds
-      .filter((tid) => !existingIds.has(tid))
-      .map((tid) =>
-        pb.collection("session_techniques").create({
-          session_id: id,
-          technique_id: tid,
-        })
-      )
-  );
+  const toCreate = techniqueIds.filter((tid) => !existingIds.has(tid));
+  const created = [];
+  for (const tid of toCreate) {
+    const record = await authUser.pb.collection("session_techniques").create({
+      session_id: id,
+      technique_id: tid,
+    });
+    created.push(record);
+  }
 
   return Response.json(created, { status: 201 });
 }
