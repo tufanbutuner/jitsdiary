@@ -8,18 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getAuthUser } from "@/lib/auth";
-import {
-  createServerClient,
-  getSessionsForUser,
-} from "@/lib/pocketbase-server";
-import {
-  GymsResponse,
-  ProfilesResponse,
-  SessionsResponse,
-} from "@/types/pocketbase";
+import { getSessions } from "@/data/sessions";
+import { getProfile } from "@/data/profile";
 import Link from "next/link";
-
-type ProfileWithGym = ProfilesResponse<{ gym_id: GymsResponse }>;
 
 const BELT_COLORS: Record<string, string> = {
   white: "bg-white border border-zinc-300",
@@ -28,8 +19,6 @@ const BELT_COLORS: Record<string, string> = {
   brown: "bg-amber-800",
   black: "bg-zinc-900 dark:bg-zinc-600",
 };
-
-type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
 const SESSION_TYPE_LABELS: Record<string, string> = {
   gi: "Gi",
@@ -100,16 +89,7 @@ export default async function Home() {
     );
   }
 
-  const { userId } = authUser;
-  const pb = createServerClient();
-  const [sessions, { items: profiles }] = await Promise.all([
-    getSessionsForUser(userId) as Promise<SessionWithGym[]>,
-    pb.collection("profiles").getList(1, 1, {
-      filter: `user_id = "${userId}"`,
-      expand: "gym_id",
-    }),
-  ]);
-  const profile = (profiles[0] as ProfileWithGym) ?? null;
+  const [sessions, profile] = await Promise.all([getSessions(), getProfile()]);
   const userName =
     (authUser.pb.authStore.record?.name as string | null) ?? null;
 

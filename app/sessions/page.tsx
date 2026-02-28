@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
-import { getSessionsForUser } from "@/lib/pocketbase-server";
+import { getSessions } from "@/data/sessions";
+import { getGyms } from "@/data/gyms";
+import { getProfile } from "@/data/profile";
 import { getAuthUser } from "@/lib/auth";
 import NewSessionModal from "@/components/NewSessionModal";
 import { Card, CardContent } from "@/components/ui/card";
-
-type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
 
 const SESSION_TYPE_LABELS: Record<string, string> = {
   gi: "Gi",
@@ -32,9 +31,14 @@ export default async function SessionsPage() {
   const authUser = await getAuthUser();
   if (!authUser) redirect("/sign-in");
 
-  const sessions = (await getSessionsForUser(authUser.userId)) as SessionWithGym[];
+  const [sessions, gyms, profile] = await Promise.all([
+    getSessions(),
+    getGyms(),
+    getProfile(),
+  ]);
 
   // Group sessions by month, preserving sort order (already -date from server)
+  type SessionWithGym = (typeof sessions)[number];
   const groups: { key: string; sessions: SessionWithGym[] }[] = [];
   for (const session of sessions) {
     const key = getMonthKey(session.date);
@@ -51,7 +55,7 @@ export default async function SessionsPage() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Sessions</h1>
-          <NewSessionModal />
+          <NewSessionModal gyms={gyms} defaultGymId={profile?.gym_id ?? ""} />
         </div>
 
         {sessions.length === 0 ? (

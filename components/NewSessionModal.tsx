@@ -13,11 +13,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGyms } from "@/hooks/useGyms";
-import { useProfile } from "@/hooks/useProfile";
 import { useSessions } from "@/hooks/useSessions";
 
-export default function NewSessionModal() {
+interface Gym {
+  id: string;
+  name: string;
+}
+
+interface Props {
+  gyms: Gym[];
+  defaultGymId: string;
+}
+
+export default function NewSessionModal({ gyms, defaultGymId }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -30,11 +38,9 @@ export default function NewSessionModal() {
     notes: "",
   });
 
-  const gyms = useGyms(open);
-  const profile = useProfile(open);
   const { submitting, error, createSession } = useSessions();
 
-  const gym_id = form.gym_id || profile?.gym_id || "";
+  const gym_id = form.gym_id || defaultGymId;
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
