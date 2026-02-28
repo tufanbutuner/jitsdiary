@@ -13,8 +13,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGyms } from "@/hooks/useGyms";
 import { useSessions } from "@/hooks/useSessions";
+
+interface Gym {
+  id: string;
+  name: string;
+}
 
 interface Props {
   session: {
@@ -26,9 +30,10 @@ interface Props {
     coach?: string;
     notes?: string;
   };
+  gyms: Gym[];
 }
 
-export default function EditSessionModal({ session }: Props) {
+export default function EditSessionModal({ session, gyms }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -41,7 +46,6 @@ export default function EditSessionModal({ session }: Props) {
     notes: session.notes ?? "",
   });
 
-  const gyms = useGyms(open);
   const { submitting, error, updateSession } = useSessions();
 
   function handleChange(

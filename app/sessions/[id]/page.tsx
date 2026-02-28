@@ -1,7 +1,10 @@
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
-import { getSessionById, getRoundsForSession, getTechniquesForSession } from "@/lib/pocketbase-server";
+import { getSession, getRoundsForSession, getTechniquesForSession } from "@/data/sessions";
+import { getGyms } from "@/data/gyms";
+import { getTechniques } from "@/data/techniques";
 import EditSessionModal from "@/components/EditSessionModal";
 import LogTechniquesModal from "@/components/LogTechniquesModal";
+import type { SessionTechnique } from "@/hooks/useTechniques";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
@@ -24,30 +27,27 @@ const OUTCOME_COLORS: Record<string, string> = {
   draw: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
 };
 
-async function getSession(id: string) {
-  const [session, rounds, techniques] = await Promise.all([
-    getSessionById(id) as Promise<SessionWithGym>,
-    getRoundsForSession(id),
-    getTechniquesForSession(id),
-  ]);
-  return { session, rounds, techniques };
-}
-
 export default async function SessionDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { session, rounds, techniques } = await getSession(id);
+  const [session, rounds, techniques, gyms, techniqueLibrary] = await Promise.all([
+    getSession(id) as Promise<SessionWithGym>,
+    getRoundsForSession(id),
+    getTechniquesForSession(id),
+    getGyms(),
+    getTechniques(),
+  ]);
   const gym = session.expand?.gym_id;
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-end gap-3">
-          <LogTechniquesModal sessionId={id} />
-          <EditSessionModal session={session} />
+          <LogTechniquesModal sessionId={id} library={techniqueLibrary} initialLogged={techniques as SessionTechnique[]} />
+          <EditSessionModal session={session} gyms={gyms} />
         </div>
 
         <Card className="mb-8">
