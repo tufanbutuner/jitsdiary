@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,8 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { useBeltProgressions, type BeltProgression } from "@/hooks/useBeltProgressions";
+import {
+  useBeltProgressions,
+  type BeltProgression,
+} from "@/hooks/useBeltProgressions";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface Gym {
   id: string;
@@ -48,7 +51,10 @@ const EMPTY_FORM = {
   notes: "",
 };
 
-export default function BeltProgressions({ progressions: initial, gyms }: Props) {
+export default function BeltProgressions({
+  progressions: initial,
+  gyms,
+}: Props) {
   const router = useRouter();
   const [progressions, setProgressions] = useState(initial);
   const [showForm, setShowForm] = useState(false);
@@ -67,8 +73,10 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
     if (record) {
       setProgressions((prev) =>
         [...prev, record].sort(
-          (a, b) => new Date(a.promoted_on).getTime() - new Date(b.promoted_on).getTime()
-        )
+          (a, b) =>
+            new Date(a.promoted_on).getTime() -
+            new Date(b.promoted_on).getTime(),
+        ),
       );
       setForm(EMPTY_FORM);
       setShowForm(false);
@@ -87,8 +95,14 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Belt History</h2>
-        <Button variant="outline" size="sm" onClick={() => setShowForm((v) => !v)}>
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          Belt History
+        </h2>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowForm((v) => !v)}
+        >
           {showForm ? "Cancel" : "+ Add promotion"}
         </Button>
       </div>
@@ -99,24 +113,35 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Belt</label>
-                  <Select value={form.belt} onValueChange={(v) => handleSelect("belt", v)} required>
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Belt
+                  </label>
+                  <Select
+                    value={form.belt}
+                    onValueChange={(v) => handleSelect("belt", v)}
+                    required
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select belt" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="white">White</SelectItem>
-                      <SelectItem value="blue">Blue</SelectItem>
-                      <SelectItem value="purple">Purple</SelectItem>
-                      <SelectItem value="brown">Brown</SelectItem>
-                      <SelectItem value="black">Black</SelectItem>
+                      {Object.keys(BELT_COLORS).map((belt) => (
+                        <SelectItem key={belt} value={belt}>
+                          {BELT_LABELS[belt]}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Stripes</label>
-                  <Select value={form.stripes} onValueChange={(v) => handleSelect("stripes", v)}>
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Stripes
+                  </label>
+                  <Select
+                    value={form.stripes}
+                    onValueChange={(v) => handleSelect("stripes", v)}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -132,44 +157,66 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Date promoted</label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Date promoted
+                </label>
                 <Input
                   type="date"
                   value={form.promoted_on}
-                  onChange={(e) => setForm((f) => ({ ...f, promoted_on: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, promoted_on: e.target.value }))
+                  }
                   required
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Gym</label>
-                <Select value={form.gym_id || "none"} onValueChange={(v) => handleSelect("gym_id", v)}>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Gym
+                </label>
+                <Select
+                  value={form.gym_id || "none"}
+                  onValueChange={(v) => handleSelect("gym_id", v)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="No gym" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No gym</SelectItem>
                     {gyms.map((g) => (
-                      <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                      <SelectItem key={g.id} value={g.id}>
+                        {g.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Notes</label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Notes
+                </label>
                 <Input
                   type="text"
                   value={form.notes}
-                  onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, notes: e.target.value }))
+                  }
                   placeholder="Optional"
                 />
               </div>
 
-              {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+              {error && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {error}
+                </p>
+              )}
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={saving || !form.belt || !form.promoted_on}>
+                <Button
+                  type="submit"
+                  disabled={saving || !form.belt || !form.promoted_on}
+                >
                   {saving ? "Saving..." : "Save"}
                 </Button>
               </div>
@@ -179,7 +226,9 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
       )}
 
       {progressions.length === 0 && !showForm ? (
-        <p className="text-sm text-muted-foreground">No promotions recorded yet.</p>
+        <p className="text-sm text-muted-foreground">
+          No promotions recorded yet.
+        </p>
       ) : (
         <ol className="relative border-l border-zinc-200 dark:border-zinc-800 ml-3 space-y-0">
           {progressions.map((p, i) => {
@@ -187,7 +236,9 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
             return (
               <li key={p.id} className="ml-6 pb-8 last:pb-0">
                 {/* dot */}
-                <span className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full ring-2 ring-white dark:ring-zinc-950 ${BELT_COLORS[p.belt] ?? "bg-zinc-400"}`} />
+                <span
+                  className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full ring-2 ring-white dark:ring-zinc-950 ${BELT_COLORS[p.belt] ?? "bg-zinc-400"}`}
+                />
 
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -205,13 +256,19 @@ export default function BeltProgressions({ progressions: initial, gyms }: Props)
                       )}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(p.promoted_on.slice(0, 10) + "T12:00:00").toLocaleDateString("en-US", {
+                      {new Date(
+                        p.promoted_on.slice(0, 10) + "T12:00:00",
+                      ).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
                       })}
                     </p>
-                    {p.notes && <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{p.notes}</p>}
+                    {p.notes && (
+                      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                        {p.notes}
+                      </p>
+                    )}
                   </div>
                   <button
                     onClick={() => handleDelete(p.id)}

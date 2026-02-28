@@ -45,7 +45,7 @@ export default async function Home() {
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col">
         <main className="flex-1 flex flex-col items-center justify-center px-6 sm:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-4">
-            Your BJJ training diary.
+            Your BJJ training diary
           </h1>
           <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-md mb-10">
             Log every session, track your rounds, and build your technique
