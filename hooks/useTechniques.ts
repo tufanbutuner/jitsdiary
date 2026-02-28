@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface Technique {
   id: string;
@@ -14,21 +15,9 @@ export interface SessionTechnique {
   expand: { technique_id: Technique };
 }
 
-export function useTechniques(sessionId: string, enabled: boolean) {
+export function useTechniqueMutations(sessionId: string, initialLogged: SessionTechnique[]) {
   const queryClient = useQueryClient();
-
-  const { data: library = [] } = useQuery<Technique[]>({
-    queryKey: ["techniques"],
-    queryFn: () => fetch("/api/techniques").then((r) => r.json()),
-    enabled,
-  });
-
-  const { data: logged = [] } = useQuery<SessionTechnique[]>({
-    queryKey: ["session-techniques", sessionId],
-    queryFn: () =>
-      fetch(`/api/sessions/${sessionId}/techniques`).then((r) => r.json()),
-    enabled,
-  });
+  const [logged, setLogged] = useState<SessionTechnique[]>(initialLogged);
 
   const logMutation = useMutation({
     mutationFn: (techniqueIds: string[]) =>
@@ -38,9 +27,10 @@ export function useTechniques(sessionId: string, enabled: boolean) {
         body: JSON.stringify({ technique_ids: techniqueIds }),
       }).then((r) => {
         if (!r.ok) throw new Error("Failed to log techniques");
-        return r.json();
+        return r.json() as Promise<SessionTechnique[]>;
       }),
-    onSuccess: () => {
+    onSuccess: (created) => {
+      setLogged((prev) => [...prev, ...created]);
       queryClient.invalidateQueries({ queryKey: ["session-techniques", sessionId] });
     },
   });
@@ -50,19 +40,8 @@ export function useTechniques(sessionId: string, enabled: boolean) {
       fetch(`/api/sessions/${sessionId}/techniques/${st.id}`, {
         method: "DELETE",
       }),
-    onMutate: async (st) => {
-      await queryClient.cancelQueries({ queryKey: ["session-techniques", sessionId] });
-      const previous = queryClient.getQueryData<SessionTechnique[]>(["session-techniques", sessionId]);
-      queryClient.setQueryData<SessionTechnique[]>(
-        ["session-techniques", sessionId],
-        (old = []) => old.filter((l) => l.id !== st.id)
-      );
-      return { previous };
-    },
-    onError: (_err, _st, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(["session-techniques", sessionId], context.previous);
-      }
+    onMutate: (st) => {
+      setLogged((prev) => prev.filter((l) => l.id !== st.id));
     },
   });
 
@@ -80,7 +59,6 @@ export function useTechniques(sessionId: string, enabled: boolean) {
   }
 
   return {
-    library,
     logged,
     submitting: logMutation.isPending,
     error: logMutation.error?.message ?? "",

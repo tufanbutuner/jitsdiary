@@ -19,10 +19,12 @@ import {
 } from "@/components/ui/popover";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useTechniques, type Technique } from "@/hooks/useTechniques";
+import { useTechniqueMutations, type Technique, type SessionTechnique } from "@/hooks/useTechniques";
 
 interface Props {
   sessionId: string;
+  library: Technique[];
+  initialLogged: SessionTechnique[];
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -34,14 +36,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   transition: "Transition",
 };
 
-export default function LogTechniquesModal({ sessionId }: Props) {
+export default function LogTechniquesModal({ sessionId, library, initialLogged }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [comboOpen, setComboOpen] = useState(false);
   const [selected, setSelected] = useState<Technique[]>([]);
 
-  const { library, logged, submitting, error, logTechniques, removeTechnique } =
-    useTechniques(sessionId, open);
+  const { logged, submitting, error, logTechniques, removeTechnique } =
+    useTechniqueMutations(sessionId, initialLogged);
 
   const loggedIds = useMemo(() => new Set(logged.map((l) => l.technique_id)), [logged]);
   const selectedIds = useMemo(() => new Set(selected.map((t) => t.id)), [selected]);
@@ -68,7 +70,7 @@ export default function LogTechniquesModal({ sessionId }: Props) {
     );
   }
 
-  async function handleRemove(st: Parameters<typeof removeTechnique>[0]) {
+  async function handleRemove(st: SessionTechnique) {
     await removeTechnique(st);
     router.refresh();
   }
