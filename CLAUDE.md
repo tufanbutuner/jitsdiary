@@ -8,6 +8,7 @@ Before generating any code, always consult the relevant file(s) in the `/docs` d
 
 - `/docs/ui.md` — UI component and date formatting standards
 - `/docs/data-fetching.md` — data fetching and database query standards
+- `/docs/auth.md` — authentication standards (PocketBase)
 
 ## Commands
 
