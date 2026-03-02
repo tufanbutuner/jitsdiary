@@ -98,9 +98,16 @@ export default async function SessionsPage() {
                                   {session.duration_minutes ? ` · ${session.duration_minutes} min` : ""}
                                 </span>
                               </div>
-                              <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                                {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                {session.notes && (
+                                  <span title="Has notes" className="text-zinc-400 dark:text-zinc-500 text-base leading-none">
+                                    📝
+                                  </span>
+                                )}
+                                <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                                  {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type}
+                                </span>
+                              </div>
                             </CardContent>
                           </Card>
                         </Link>

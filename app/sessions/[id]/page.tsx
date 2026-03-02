@@ -4,6 +4,7 @@ import { getGyms } from "@/data/gyms";
 import { getTechniques } from "@/data/techniques";
 import EditSessionModal from "@/components/EditSessionModal";
 import LogTechniquesModal from "@/components/LogTechniquesModal";
+import SessionNotes from "@/components/SessionNotes";
 import type { SessionTechnique } from "@/hooks/useTechniques";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -73,13 +74,9 @@ export default async function SessionDetailPage({
               </span>
             </CardAction>
           </CardHeader>
-          {session.notes && (
-            <CardContent className="pt-0">
-              <p className="text-sm text-muted-foreground">
-                {session.notes}
-              </p>
-            </CardContent>
-          )}
+          <CardContent className="pt-0">
+            <SessionNotes sessionId={id} initialNotes={session.notes ?? ""} />
+          </CardContent>
         </Card>
 
         {techniques.length > 0 && (
