@@ -5,6 +5,7 @@ import { getTechniques } from "@/data/techniques";
 import EditSessionModal from "@/components/EditSessionModal";
 import LogTechniquesModal from "@/components/LogTechniquesModal";
 import SessionNotes from "@/components/SessionNotes";
+import DeleteSessionButton from "@/components/DeleteSessionButton";
 import type { SessionTechnique } from "@/hooks/useTechniques";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -47,6 +48,7 @@ export default async function SessionDetailPage({
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6 flex items-center justify-end gap-3">
+          <DeleteSessionButton sessionId={id} />
           <LogTechniquesModal sessionId={id} library={techniqueLibrary} initialLogged={techniques as SessionTechnique[]} />
           <EditSessionModal session={session} gyms={gyms} />
         </div>
