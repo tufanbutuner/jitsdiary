@@ -17,8 +17,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Modal from "@/components/Modal";
 import { useTechniqueMutations, type Technique, type SessionTechnique } from "@/hooks/useTechniques";
 
 interface Props {
@@ -95,19 +95,8 @@ export default function LogTechniquesModal({ sessionId, library, initialLogged }
       <Button variant="outline" onClick={() => setOpen(true)}>Log Techniques</Button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-lg shadow-xl flex flex-col max-h-[85vh]">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-              <CardTitle>Log Techniques</CardTitle>
-              <button
-                onClick={handleClose}
-                className="text-muted-foreground hover:text-foreground text-xl leading-none"
-                type="button"
-              >
-                ×
-              </button>
-            </CardHeader>
-            <CardContent className="flex flex-col flex-1 min-h-0 overflow-hidden">
+        <Modal title="Log Techniques" onClose={handleClose} maxWidth="max-w-lg" className="flex flex-col max-h-[85vh]">
+          <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
               {logged.length > 0 && (
                 <div className="mb-4">
                   <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">Already logged</p>
@@ -205,9 +194,8 @@ export default function LogTechniquesModal({ sessionId, library, initialLogged }
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+          </div>
+        </Modal>
       )}
     </>
   );

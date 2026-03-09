@@ -4,7 +4,7 @@ import { getSessions } from "@/data/sessions";
 import { getGyms } from "@/data/gyms";
 import { getProfile } from "@/data/profile";
 import { getAuthUser } from "@/lib/auth";
-import NewSessionModal from "@/components/NewSessionModal";
+import NewSessionModal from "@/components/modals/NewSessionModal";
 import { Card, CardContent } from "@/components/ui/card";
 
 const SESSION_TYPE_LABELS: Record<string, string> = {
