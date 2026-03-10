@@ -16,32 +16,14 @@ import {
 } from "@/hooks/useBeltProgressions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-interface Gym {
-  id: string;
-  name: string;
-}
+import { BELT_COLORS, BELT_LABELS } from "@/lib/constants";
+import type { Gym } from "@/types/index";
+import FormField from "@/components/FormField";
 
 interface Props {
   progressions: BeltProgression[];
   gyms: Gym[];
 }
-
-const BELT_COLORS: Record<string, string> = {
-  white: "bg-white border-2 border-zinc-300",
-  blue: "bg-blue-600",
-  purple: "bg-purple-600",
-  brown: "bg-amber-800",
-  black: "bg-zinc-900 dark:bg-zinc-600",
-};
-
-const BELT_LABELS: Record<string, string> = {
-  white: "White",
-  blue: "Blue",
-  purple: "Purple",
-  brown: "Brown",
-  black: "Black",
-};
 
 const EMPTY_FORM = {
   belt: "",
@@ -112,10 +94,7 @@ export default function BeltProgressions({
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Belt
-                  </label>
+                <FormField label="Belt">
                   <Select
                     value={form.belt}
                     onValueChange={(v) => handleSelect("belt", v)}
@@ -132,12 +111,9 @@ export default function BeltProgressions({
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
+                </FormField>
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Stripes
-                  </label>
+                <FormField label="Stripes">
                   <Select
                     value={form.stripes}
                     onValueChange={(v) => handleSelect("stripes", v)}
@@ -153,13 +129,10 @@ export default function BeltProgressions({
                       <SelectItem value="4">4</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </FormField>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Date promoted
-                </label>
+              <FormField label="Date promoted">
                 <Input
                   type="date"
                   value={form.promoted_on}
@@ -168,12 +141,9 @@ export default function BeltProgressions({
                   }
                   required
                 />
-              </div>
+              </FormField>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Gym
-                </label>
+              <FormField label="Gym">
                 <Select
                   value={form.gym_id || "none"}
                   onValueChange={(v) => handleSelect("gym_id", v)}
@@ -190,12 +160,9 @@ export default function BeltProgressions({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Notes
-                </label>
+              <FormField label="Notes">
                 <Input
                   type="text"
                   value={form.notes}
@@ -204,7 +171,7 @@ export default function BeltProgressions({
                   }
                   placeholder="Optional"
                 />
-              </div>
+              </FormField>
 
               {error && (
                 <p className="text-sm text-red-600 dark:text-red-400">

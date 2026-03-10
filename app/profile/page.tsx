@@ -7,14 +7,7 @@ import { getGyms } from "@/data/gyms";
 import { getBeltProgressions } from "@/data/belt-progressions";
 import { BeltProgressionsResponse } from "@/types/pocketbase";
 import { redirect } from "next/navigation";
-
-const BELT_COLORS: Record<string, string> = {
-  white: "bg-white border-2 border-zinc-300",
-  blue: "bg-blue-600",
-  purple: "bg-purple-600",
-  brown: "bg-amber-800",
-  black: "bg-zinc-900 dark:bg-zinc-700",
-};
+import { BELT_COLORS } from "@/lib/constants";
 
 export default async function ProfilePage() {
   const authUser = await getAuthUser();

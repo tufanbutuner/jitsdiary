@@ -15,11 +15,7 @@ import {
 import { useSessions } from "@/hooks/useSessions";
 import Modal from "@/components/Modal";
 import FormField from "@/components/FormField";
-
-interface Gym {
-  id: string;
-  name: string;
-}
+import type { Gym } from "@/types/index";
 
 interface Props {
   session: {

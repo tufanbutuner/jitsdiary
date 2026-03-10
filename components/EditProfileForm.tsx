@@ -12,11 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface Gym {
-  id: string;
-  name: string;
-}
+import FormField from "@/components/FormField";
+import type { Gym } from "@/types/index";
 
 interface Profile {
   id: string;
@@ -83,13 +80,11 @@ export default function EditProfileForm({ profile, gyms }: Props) {
     <Card>
       <CardContent className="pt-6">
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Display name</label>
+      <FormField label="Display name">
         <Input type="text" name="display_name" value={form.display_name} onChange={handleChange} placeholder="e.g. Tufan" />
-      </div>
+      </FormField>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Belt</label>
+      <FormField label="Belt">
         <Select value={form.belt} onValueChange={(v) => handleSelect("belt", v)}>
           <SelectTrigger>
             <SelectValue placeholder="Select belt" />
@@ -102,10 +97,9 @@ export default function EditProfileForm({ profile, gyms }: Props) {
             <SelectItem value="black">Black</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </FormField>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Stripes</label>
+      <FormField label="Stripes">
         <Select value={form.stripes} onValueChange={(v) => handleSelect("stripes", v)}>
           <SelectTrigger>
             <SelectValue />
@@ -118,10 +112,9 @@ export default function EditProfileForm({ profile, gyms }: Props) {
             <SelectItem value="4">4</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </FormField>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Home gym</label>
+      <FormField label="Home gym">
         <Select value={form.gym_id || "none"} onValueChange={(v) => handleSelect("gym_id", v)}>
           <SelectTrigger>
             <SelectValue placeholder="No gym" />
@@ -133,7 +126,7 @@ export default function EditProfileForm({ profile, gyms }: Props) {
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </FormField>
 
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       {saved && <p className="text-sm text-green-600 dark:text-green-400">Profile saved.</p>}

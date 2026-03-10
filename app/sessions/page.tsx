@@ -6,12 +6,7 @@ import { getProfile } from "@/data/profile";
 import { getAuthUser } from "@/lib/auth";
 import NewSessionModal from "@/components/modals/NewSessionModal";
 import { Card, CardContent } from "@/components/ui/card";
-
-const SESSION_TYPE_LABELS: Record<string, string> = {
-  gi: "Gi",
-  no_gi: "No-Gi",
-  open_mat: "Open Mat",
-};
+import { SESSION_TYPE_LABELS } from "@/lib/constants";
 
 function getMonthKey(date: string) {
   // date is "YYYY-MM-DD..." — take the local date parts directly to avoid UTC shift

@@ -10,21 +10,8 @@ import {
 import { getAuthUser } from "@/lib/auth";
 import { getSessions } from "@/data/sessions";
 import { getProfile } from "@/data/profile";
+import { BELT_COLORS, SESSION_TYPE_LABELS } from "@/lib/constants";
 import Link from "next/link";
-
-const BELT_COLORS: Record<string, string> = {
-  white: "bg-white border border-zinc-300",
-  blue: "bg-blue-600",
-  purple: "bg-purple-600",
-  brown: "bg-amber-800",
-  black: "bg-zinc-900 dark:bg-zinc-600",
-};
-
-const SESSION_TYPE_LABELS: Record<string, string> = {
-  gi: "Gi",
-  no_gi: "No-Gi",
-  open_mat: "Open Mat",
-};
 
 export default async function Home() {
   const authUser = await getAuthUser();

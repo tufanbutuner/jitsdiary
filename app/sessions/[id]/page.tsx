@@ -8,26 +8,9 @@ import SessionNotes from "@/components/SessionNotes";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
 import type { SessionTechnique } from "@/hooks/useTechniques";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SESSION_TYPE_LABELS, OUTCOME_LABELS, OUTCOME_COLORS } from "@/lib/constants";
 
 type SessionWithGym = SessionsResponse<{ gym_id: GymsResponse }>;
-
-const SESSION_TYPE_LABELS: Record<string, string> = {
-  gi: "Gi",
-  no_gi: "No-Gi",
-  open_mat: "Open Mat",
-};
-
-const OUTCOME_LABELS: Record<string, string> = {
-  won: "Win",
-  lost: "Loss",
-  draw: "Draw",
-};
-
-const OUTCOME_COLORS: Record<string, string> = {
-  won: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-  lost: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-  draw: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
-};
 
 export default async function SessionDetailPage({
   params,
