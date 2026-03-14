@@ -1,4 +1,4 @@
-import SessionCalendar from "@/components/SessionCalendar";
+import CalendarWithModal from "@/components/CalendarWithModal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +10,7 @@ import {
 import { getAuthUser } from "@/lib/auth";
 import { getSessions } from "@/data/sessions";
 import { getProfile } from "@/data/profile";
+import { getGyms } from "@/data/gyms";
 import { BELT_COLORS, SESSION_TYPE_LABELS } from "@/lib/constants";
 import Link from "next/link";
 
@@ -76,7 +77,7 @@ export default async function Home() {
     );
   }
 
-  const [sessions, profile] = await Promise.all([getSessions(), getProfile()]);
+  const [sessions, profile, gyms] = await Promise.all([getSessions(), getProfile(), getGyms()]);
   const userName =
     (authUser.pb.authStore.record?.name as string | null) ?? null;
 
@@ -191,7 +192,11 @@ export default async function Home() {
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
               Training Calendar
             </h2>
-            <SessionCalendar sessionDates={sessions.map((s) => s.date)} />
+            <CalendarWithModal
+              sessionDates={sessions.map((s) => s.date)}
+              gyms={gyms}
+              defaultGymId={profile?.gym_id ?? ""}
+            />
           </div>
 
           {/* Recent sessions */}

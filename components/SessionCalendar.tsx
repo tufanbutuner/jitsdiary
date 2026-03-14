@@ -13,6 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 
 interface SessionCalendarProps {
   sessionDates: string[];
+  onDateClick?: (date: string) => void;
 }
 
 function toLocalDateKey(d: string) {
@@ -60,7 +61,7 @@ function CustomMonthCaption({ calendarMonth }: { calendarMonth: { date: Date } }
   );
 }
 
-export default function SessionCalendar({ sessionDates }: SessionCalendarProps) {
+export default function SessionCalendar({ sessionDates, onDateClick }: SessionCalendarProps) {
   const today = new Date();
   const [month, setMonth] = useState<Date>(today);
 
@@ -119,9 +120,13 @@ export default function SessionCalendar({ sessionDates }: SessionCalendarProps) 
           return (
             <button
               {...props}
+              onClick={(e) => {
+                props.onClick?.(e);
+                if (!modifiers.disabled) onDateClick?.(dateKey(day.date));
+              }}
               className={cn(
                 buttonVariants({ variant: "ghost", size: "icon" }),
-                "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col items-center justify-center gap-0.5 leading-none font-normal rounded-md",
+                "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col items-center justify-center gap-0.5 leading-none font-normal rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800",
                 isSelected &&
                   "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
                 className

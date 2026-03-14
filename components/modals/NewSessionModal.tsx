@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,20 +20,32 @@ import type { Gym } from "@/types/index";
 interface Props {
   gyms: Gym[];
   defaultGymId: string;
+  initialDate?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function NewSessionModal({ gyms, defaultGymId }: Props) {
+export default function NewSessionModal({ gyms, defaultGymId, initialDate, open: controlledOpen, onOpenChange }: Props) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
+  function setOpen(value: boolean) {
+    setInternalOpen(value);
+    onOpenChange?.(value);
+  }
 
   const [form, setForm] = useState({
-    date: new Date().toISOString().slice(0, 10),
+    date: initialDate ?? new Date().toISOString().slice(0, 10),
     session_type: "gi",
     gym_id: "",
     duration_minutes: "",
     coach: "",
     notes: "",
   });
+
+  useEffect(() => {
+    if (initialDate) setForm((f) => ({ ...f, date: initialDate }));
+  }, [initialDate]);
 
   const { submitting, error, createSession } = useSessions();
 
@@ -60,7 +72,9 @@ export default function NewSessionModal({ gyms, defaultGymId }: Props) {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>+ New Session</Button>
+      {controlledOpen === undefined && (
+        <Button onClick={() => setOpen(true)}>+ New Session</Button>
+      )}
 
       {open && (
         <Modal title="New Session" onClose={() => setOpen(false)}>
