@@ -12,6 +12,7 @@ export enum Collections {
 	Otps = "_otps",
 	Superusers = "_superusers",
 	BeltProgressions = "belt_progressions",
+	Competitions = "competitions",
 	Gyms = "gyms",
 	Profiles = "profiles",
 	RollingRounds = "rolling_rounds",
@@ -115,6 +116,32 @@ export type BeltProgressionsRecord = {
 	stripes: number
 	user_id: string
 }
+
+export enum CompetitionsDivisionOptions {
+	"gi" = "gi",
+	"no_gi" = "no_gi",
+}
+
+export enum CompetitionsResultOptions {
+	"gold" = "gold",
+	"silver" = "silver",
+	"bronze" = "bronze",
+	"no_placement" = "no_placement",
+}
+
+export type CompetitionsRecord = {
+	date: string
+	division?: CompetitionsDivisionOptions
+	id: string
+	location?: string
+	name: string
+	notes?: string
+	result?: CompetitionsResultOptions
+	user_id: string
+	weight_class?: string
+}
+
+export type CompetitionsResponse<Texpand = unknown> = Required<CompetitionsRecord> & BaseSystemFields<Texpand>
 
 export type GymsRecord = {
 	id: string
@@ -240,6 +267,7 @@ export type CollectionRecords = {
 	_otps: OtpsRecord
 	_superusers: SuperusersRecord
 	belt_progressions: BeltProgressionsRecord
+	competitions: CompetitionsRecord
 	gyms: GymsRecord
 	profiles: ProfilesRecord
 	rolling_rounds: RollingRoundsRecord
@@ -256,6 +284,7 @@ export type CollectionResponses = {
 	_otps: OtpsResponse
 	_superusers: SuperusersResponse
 	belt_progressions: BeltProgressionsResponse
+	competitions: CompetitionsResponse
 	gyms: GymsResponse
 	profiles: ProfilesResponse
 	rolling_rounds: RollingRoundsResponse

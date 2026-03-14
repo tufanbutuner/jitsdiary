@@ -45,6 +45,9 @@ export default async function RootLayout({
               <Link href="/sessions" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
                 Sessions
               </Link>
+              <Link href="/competitions" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
+                Competitions
+              </Link>
               <Link href="/profile" className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition">
                 Profile
               </Link>

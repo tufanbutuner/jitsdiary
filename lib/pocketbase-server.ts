@@ -1,5 +1,5 @@
 import PocketBase from "pocketbase";
-import type { TypedPocketBase, RollingRoundsResponse, SessionsResponse } from "@/types/pocketbase";
+import type { TypedPocketBase, RollingRoundsResponse, SessionsResponse, CompetitionsResponse } from "@/types/pocketbase";
 import { connect } from "node:net";
 
 const PB_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL ?? "http://127.0.0.1:8090";
@@ -80,6 +80,25 @@ export async function getTechniquesForSession(sessionId: string): Promise<{ id: 
   const json = await rawGet(path);
   if (typeof json.status === "number" && json.status >= 400) return [];
   return (json.items as never[]) ?? [];
+}
+
+export async function getCompetitionsForUser(userId: string): Promise<CompetitionsResponse[]> {
+  const filter = `user_id=%22${userId}%22`;
+  const path = `/api/collections/competitions/records?perPage=200&sort=-date&filter=${filter}`;
+  const json = await rawGet(path);
+  if (typeof json.status === "number" && json.status >= 400) {
+    throw new Error((json.message as string) ?? "Failed to fetch competitions");
+  }
+  return (json.items as CompetitionsResponse[]) ?? [];
+}
+
+export async function getCompetitionById(id: string): Promise<CompetitionsResponse> {
+  const path = `/api/collections/competitions/records/${id}`;
+  const json = await rawGet(path);
+  if (typeof json.status === "number" && json.status >= 400) {
+    throw new Error((json.message as string) ?? "Competition not found");
+  }
+  return json as unknown as CompetitionsResponse;
 }
 
 export async function getSessionsForUser(userId: string): Promise<SessionsResponse[]> {

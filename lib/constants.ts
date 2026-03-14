@@ -31,3 +31,22 @@ export const OUTCOME_COLORS: Record<string, string> = {
   lost: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
   draw: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
 };
+
+export const COMPETITION_RESULT_LABELS: Record<string, string> = {
+  gold: "Gold",
+  silver: "Silver",
+  bronze: "Bronze",
+  no_placement: "No placement",
+};
+
+export const COMPETITION_RESULT_COLORS: Record<string, string> = {
+  gold: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+  silver: "bg-zinc-100 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200",
+  bronze: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+  no_placement: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+};
+
+export const COMPETITION_DIVISION_LABELS: Record<string, string> = {
+  gi: "Gi",
+  no_gi: "No-Gi",
+};
