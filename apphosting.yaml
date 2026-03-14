@@ -9,42 +9,42 @@ runConfig:
 
 env:
   - variable: NEXT_PUBLIC_POCKETBASE_URL
-    value: REDACTED
+    secret: NEXT_PUBLIC_POCKETBASE_URL
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: REDACTED
+    secret: NEXT_PUBLIC_FIREBASE_API_KEY
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    value: jitsdiary.firebaseapp.com
+    secret: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: jitsdiary
+    secret: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: jitsdiary.firebasestorage.app
+    secret: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    value: "REDACTED"
+    secret: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: "1:REDACTED:web:d3e6450eddb6ac4a6d8c97"
+    secret: NEXT_PUBLIC_FIREBASE_APP_ID
     availability:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    value: REDACTED
+    secret: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
     availability:
       - BUILD
       - RUNTIME
