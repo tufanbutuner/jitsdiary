@@ -1,4 +1,5 @@
 import { SessionsResponse, GymsResponse } from "@/types/pocketbase";
+import { format } from "date-fns";
 import { getSession, getRoundsForSession, getTechniquesForSession } from "@/data/sessions";
 import { getGyms } from "@/data/gyms";
 import { getTechniques } from "@/data/techniques";
@@ -39,12 +40,7 @@ export default async function SessionDetailPage({
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-xl">
-              {new Date(session.date).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {format(new Date(session.date), "do MMM yyyy")}
             </CardTitle>
             <CardDescription>
               {gym?.name ?? "No gym"}

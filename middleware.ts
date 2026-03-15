@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/sessions", "/profile"];
+const protectedRoutes = ["/sessions", "/profile", "/competitions"];
 
 export function middleware(req: NextRequest) {
   const isProtected = protectedRoutes.some((r) => req.nextUrl.pathname.startsWith(r));

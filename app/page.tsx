@@ -12,6 +12,7 @@ import { getSessions } from "@/data/sessions";
 import { getProfile } from "@/data/profile";
 import { getGyms } from "@/data/gyms";
 import { BELT_COLORS, SESSION_TYPE_LABELS } from "@/lib/constants";
+import { format } from "date-fns";
 import Link from "next/link";
 
 export default async function Home() {
@@ -239,15 +240,7 @@ export default async function Home() {
                           <CardContent className="flex items-center justify-between py-0">
                             <div className="flex flex-col gap-1">
                               <span className="font-medium">
-                                {new Date(session.date).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    weekday: "short",
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  },
-                                )}
+                                {format(new Date(session.date), "do MMM yyyy")}
                               </span>
                               <span className="text-sm text-muted-foreground">
                                 {gym?.name ?? "No gym"}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { format } from "date-fns";
 import { getSessions } from "@/data/sessions";
 import { getGyms } from "@/data/gyms";
 import { getProfile } from "@/data/profile";
@@ -16,10 +17,7 @@ function getMonthKey(date: string) {
 
 function formatMonthKey(key: string) {
   const [year, month] = key.split("-");
-  return new Date(Number(year), Number(month) - 1, 1).toLocaleString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
+  return format(new Date(Number(year), Number(month) - 1, 1), "MMMM yyyy");
 }
 
 export default async function SessionsPage() {
@@ -82,11 +80,7 @@ export default async function SessionsPage() {
                             <CardContent className="flex items-center justify-between py-0">
                               <div className="flex flex-col gap-1">
                                 <span className="font-medium">
-                                  {new Date(session.date).toLocaleDateString("en-US", {
-                                    weekday: "short",
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
+                                  {format(new Date(session.date), "do MMM yyyy")}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
                                   {gym?.name ?? "No gym"}
