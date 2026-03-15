@@ -80,7 +80,7 @@ export default async function SessionsPage() {
                             <CardContent className="flex items-center justify-between py-0">
                               <div className="flex flex-col gap-1">
                                 <span className="font-medium">
-                                  {format(new Date(session.date), "do MMM yyyy")}
+                                  {format(new Date(session.date), "EEEE do MMMM yyyy")}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
                                   {gym?.name ?? "No gym"}

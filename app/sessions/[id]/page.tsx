@@ -40,7 +40,7 @@ export default async function SessionDetailPage({
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-xl">
-              {format(new Date(session.date), "do MMM yyyy")}
+              {format(new Date(session.date), "EEEE do MMMM yyyy")}
             </CardTitle>
             <CardDescription>
               {gym?.name ?? "No gym"}

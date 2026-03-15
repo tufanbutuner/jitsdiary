@@ -18,17 +18,15 @@ Use [date-fns](https://date-fns.org/) for all date formatting. No other date lib
 
 Dates must be formatted in the following style:
 
-```
-1st Sep 2025
-2nd Aug 2025
-3rd Sep 2026
-4th Jun 2025
+```text
+Tuesday 10th March 2025
+Wednesday 2nd August 2025
 ```
 
-Use the format string `do MMM yyyy` with `date-fns/format`:
+Use the format string `EEEE do MMMM yyyy` with `date-fns/format`:
 
 ```ts
 import { format } from "date-fns";
 
-format(date, "do MMM yyyy"); // e.g. "1st Sep 2025"
+format(date, "EEEE do MMMM yyyy"); // e.g. "Tuesday 10th March 2025"
 ```
